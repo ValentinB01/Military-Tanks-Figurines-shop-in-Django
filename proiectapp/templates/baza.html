@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figurine Tancuri Militare</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Figurine Tancuri Militare</h1>
+            <nav>
+                <ul class="meniu-derulant">
+                    <li><a href="{% url 'index' %}">Acasa</a>
+                        <ul class="submeniu">
+                            <li><a href="#cele-mai-populare">Cele mai populare</a></li>
+                            <li><a href="#noutati">Noutati</a></li>
+                            <li><a href="#oferta-speciala">Oferta speciala</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{% url 'despre' %}">Despre</a>
+                        <ul class="submeniu">
+                            <li><a href="#istoric">Istoric</a></li>
+                            <li><a href="#colectie">Colectia noastra</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{% url 'produse' %}">Produse</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    <li><a href="{% url 'cos_virtual' %}">Cos Virtual</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>IP-ul tau: {{ ip_address }}</p>
+            <p>&copy; 2025 Figurine Tancuri Militare. Toate drepturile rezervate.</p>
+        </div>
+    </footer>
+</body>
+</html>

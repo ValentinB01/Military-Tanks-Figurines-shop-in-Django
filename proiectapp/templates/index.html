@@ -1,0 +1,24 @@
+{% extends 'baza.html' %}
+{% load static %}
+
+{% block content %}
+<section id="cele-mai-populare">
+    <h2>Cele mai populare figurine de tancuri</h2>
+    <img src="{% static 'imagini/m4sherman.jpg' %}" alt="Tanc Sherman M4" width="400">
+    <p>Descopera colectia noastra de figurine de tancuri cele mai populare, incluzand modele precum Sherman M4, Tiger I și T-34.</p>
+    <p>Fiecare figurina este reprodusa cu atentie la detalii, cu o scara la alegerea clientului si include piese detasabile.</p>
+</section>
+
+<section id="noutati">
+    <h2>Noutati in colectie</h2>
+    <p>Bine ai venit in lumea fascinanta a figurinelor de tancuri militare! Suntem pasionati de istoria tancurilor militare si de colectionarea modelelor autentice.</p>
+    <p>Acum avem in stoc si noile modele de tancuri moderne Abrams M1A2 și Leopard 2A7.</p>
+</section>
+
+<section id="oferta-speciala">
+    <h2>Oferta speciala saptamanala</h2>
+    <img src="{% static 'imagini/tiger1.jpg' %}" alt="Tanc Tiger I" width="400">
+    <p>Acum beneficiezi de reducere de 15% la toate modelele de tancuri germane din Al Doilea Război Mondial.</p>
+    <p>Oferta este valabila până la sfârșitul saptamanii. Nu rata sansa de a-ti completa colectia!</p>
+</section>
+{% endblock %}

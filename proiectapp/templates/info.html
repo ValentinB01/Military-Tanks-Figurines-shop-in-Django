@@ -1,0 +1,67 @@
+{% extends 'baza.html' %}
+{% load static %}
+
+{% block content %}
+<html>
+<head>
+    <title>Pagina Info</title>
+    <style>
+        .section { margin: 20px 0; }
+        .section-title { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; }
+        .param-list { list-style-type: none; padding: 0; }
+        .param-item { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .param-name { font-weight: bold; color: #2c3e50; }
+        .param-values { margin-left: 20px; }
+        .examples { background-color: #f8f9fa; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Pagina de Informatii</h1>
+    
+    <div class="section">
+        <div class="section-title">Parametri</div>
+        
+        <p>Pagina a primit <strong>{{ param_count }}</strong> parametrii.</p>
+        
+        {% if param_count > 0 %}
+            <p>Numele parametrilor: <strong>{{ param_names|join:", " }}</strong></p>
+            
+            <h3>Detalii parametri:</h3>
+            <ul class="param-list">
+                {% for param in param_details %}
+                    <li class="param-item">
+                        <span class="param-name">{{ param.name }}</span>
+                        <div class="param-values">
+                            <strong>Valori ({{ param.count }}):</strong>
+                            <ul>
+                                {% for value in param.values %}
+                                    <li><code>{{ value }}</code></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Nu au fost furnizati parametri în URL.</p>
+            <p>Încearcă sa adaugi parametri în URL, de exemplu: <code>/info?nume=Test&amp;categorie=web</code></p>
+        {% endif %}
+    </div>
+    
+    <div class="section examples">
+        <h3>Exemple pentru testare:</h3>
+        <ul>
+            <li><a href="{% url 'info' %}">/info</a> (fara parametri)</li>
+            <li><a href="{% url 'info' %}?nume=John&varsta=30">/info?nume=John&varsta=30</a></li>
+            <li><a href="{% url 'info' %}?categorie=tehnologie&categorie=sport&sort=desc">/info?categorie=tehnologie&categorie=sport&sort=desc</a></li>
+            <li><a href="{% url 'info' %}?search=test&limit=10&page=1&sort=nume">/info?search=test&limit=10&page=1&sort=nume</a></li>
+            <li><a href="{% url 'info' %}?param1=val1&param2=val2&param3=val3">/info?param1=val1&param2=val2&param3=val3</a></li>
+        </ul>
+    </div>
+    
+    <div class="section">
+        <a href="{% url 'log' %}">← Inapoi la pagina de log</a>
+    </div>
+</body>
+</html>
+{% endblock %}

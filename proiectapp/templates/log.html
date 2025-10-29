@@ -1,0 +1,238 @@
+{% extends 'baza.html' %}
+{% load static %}
+
+{% block content %}
+<html>
+<head>
+    <title>Log Accesari</title>
+    <style>
+        .error { color: red; }
+        .log-entry { margin: 5px 0; padding: 5px; border-bottom: 1px solid #eee; }
+        .section { margin: 20px 0; }
+        .section-title { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; }
+        .access-details { list-style-type: disc; margin-left: 20px; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .stats { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .stat-item { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Istoricul accesarilor</h1>
+    
+    <form method="get">
+        <div>
+            <label for="ultimele">Afiseaza ultimele:</label>
+            <input type="number" id="ultimele" name="ultimele" min="1" 
+                   placeholder="Numar accesari" value="{{ current_params.ultimele }}">
+        </div>
+        
+        <div>
+            <label for="accesari">Afisare accesari:</label>
+            <select id="accesari" name="accesari">
+                <option value="">-- Selecteaza --</option>
+                <option value="nr" {% if current_params.accesari == 'nr' %}selected{% endif %}>
+                    Numarul total
+                </option>
+                <option value="detalii" {% if current_params.accesari == 'detalii' %}selected{% endif %}>
+                    Detalii complete
+                </option>
+            </select>
+        </div>
+        
+        <div>
+            <label for="tabel">Afisare tabelara:</label>
+            <select id="tabel" name="tabel">
+                <option value="">-- Selecteaza --</option>
+                <option value="tot" {% if current_params.tabel == 'tot' %}selected{% endif %}>
+                    Toate coloanele
+                </option>
+                <option value="id,timestamp" {% if current_params.tabel == 'id,timestamp' %}selected{% endif %}>
+                    ID si Timestamp
+                </option>
+                <option value="id,path" {% if current_params.tabel == 'id,path' %}selected{% endif %}>
+                    ID si URL
+                </option>
+                <option value="id,method,path" {% if current_params.tabel == 'id,method,path' %}selected{% endif %}>
+                    ID, Method, URL
+                </option>
+            </select>
+            <small>Sau introdu manual: id,timestamp,method,path,ip_address</small>
+        </div>
+        
+        <div>
+            <label for="iduri">ID-uri (separate prin virgula):</label>
+            <input type="text" id="iduri" name="iduri" 
+                   placeholder="2,3,5" value="{{ current_params.iduri }}">
+            <small>Poti adauga mai multe campuri iduri în URL manual</small>
+        </div>
+        
+        <div>
+            <label for="dubluri">Permite dubluri:</label>
+            <input type="checkbox" id="dubluri" name="dubluri" value="true"
+                   {% if current_params.dubluri == 'true' %}checked{% endif %}>
+        </div>
+        
+        <button type="submit">Filtreaza</button>
+        <a href="{% url 'log' %}"><button type="button">Reseteaza</button></a>
+    </form>
+
+    {% if error_message %}
+        <p class="error">{{ error_message }}</p>
+    {% endif %}
+
+    {% if show_access_count %}
+        <div class="section">
+            <div class="section-title">Numarul total de accesari</div>
+            <p>Au fost inregistrate <strong>{{ total_logs }}</strong> accesari de cand serverul a fost pornit.</p>
+        </div>
+    {% endif %}
+
+    {% if show_access_details %}
+        <div class="section">
+            <div class="section-title">Detalii complete ale accesarilor</div>
+            <ul class="access-details">
+                {% for log in logs %}
+                    <li>
+                        <strong>{{ log.timestamp }}</strong> - 
+                        {{ log.method }} <code>{{ log.path }}</code> - 
+                        {{ log.ip_address }} (ID: {{ log.id }})
+                    </li>
+                {% empty %}
+                    <li>Nu exista accesari inregistrate.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if show_table %}
+        <div class="section">
+            <div class="section-title">
+                Tabel accesari 
+                {% if logs_by_id %}
+                    (după ID-uri)
+                {% else %}
+                    (toate accesările)
+                {% endif %}
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in table_columns %}
+                            <th>
+                                {% if column == 'id' %}ID
+                                {% elif column == 'timestamp' %}Timestamp
+                                {% elif column == 'method' %}Method
+                                {% elif column == 'path' %}URL
+                                {% elif column == 'ip_address' %}IP Address
+                                {% else %}{{ column }}{% endif %}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in table_data %}
+                        <tr>
+                            {% for column in table_columns %}
+                                <td>
+                                    {% if column == 'id' %}{{ log.id }}
+                                    {% elif column == 'timestamp' %}{{ log.timestamp }}
+                                    {% elif column == 'method' %}{{ log.method }}
+                                    {% elif column == 'path' %}{{ log.path }}
+                                    {% elif column == 'ip_address' %}{{ log.ip_address }}
+                                    {% else %}{{ log|stringformat:"s" }}{% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="{{ table_columns|length }}">Nu exista date de afisat</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if logs_by_id and not show_table %}
+        <div class="section">
+            <div class="section-title">Accesari dupa ID-uri</div>
+            <p>Parametrul dubluri este setat la: <strong>{{ allow_duplicates }}</strong></p>
+            
+            <div class="log-entries">
+                {% for log in logs_by_id %}
+                    <div class="log-entry">
+                        <strong>ID {{ log.id }}</strong> - 
+                        <strong>{{ log.timestamp }}</strong> - 
+                        {{ log.method }} <code>{{ log.path }}</code> - 
+                        {{ log.ip_address }}
+                    </div>
+                {% empty %}
+                    <p>Nu s-au găsit accesari pentru ID-urile specificate.</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if not show_table %}
+        <div class="section">
+            <div class="section-title">Istoricul accesarilor</div>
+            <p>Total accesari afisate: {{ logs|length }}</p>
+
+            <div class="log-entries">
+                {% for log in logs %}
+                    <div class="log-entry">
+                        <strong>ID {{ log.id }}</strong> - 
+                        <strong>{{ log.afis_data }}</strong> - 
+                        {{ log.method }} <code>{{ log.path }}</code> - 
+                        {{ log.ip_address }}
+                    </div>
+                {% empty %}
+                    <p>Nu exista accesari inregistrate.</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+
+    <div class="stats">
+        <div class="section-title">Statistici Accesari Pagini</div>
+        
+        {% if least_accessed and most_accessed %}
+            <div class="stat-item">
+                <strong>Pagina cea mai putin accesata:</strong>
+                <code>{{ least_accessed.path }}</code> 
+                ({{ least_accessed.access_count }} accesari)
+            </div>
+            
+            <div class="stat-item">
+                <strong>Pagina cea mai accesata:</strong>
+                <code>{{ most_accessed.path }}</code> 
+                ({{ most_accessed.access_count }} accesari)
+            </div>
+        {% else %}
+            <p>Nu exista suficiente date pentru statistici.</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <div class="section-title">Parametrii curenti</div>
+        <ul>
+            <li>ultimele: {{ current_params.ultimele|default:"nespecificat" }}</li>
+            <li>accesari: {{ current_params.accesari|default:"nespecificat" }}</li>
+            <li>tabel: {{ current_params.tabel|default:"nespecificat" }}</li>
+            <li>iduri: {{ current_params.iduri|default:"nespecificat" }}</li>
+            <li>dubluri: {{ current_params.dubluri|default:"false" }}</li>
+        </ul>
+    </div>
+
+    <div class="section">
+    <a href="{% url 'info' %}">Vezi pagina de informații</a>
+</div>
+
+</body>
+</html>
+{% endblock %}
