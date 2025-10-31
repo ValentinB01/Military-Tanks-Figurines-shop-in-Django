@@ -27,6 +27,15 @@
                         </ul>
                     </li>
                     <li><a href="{% url 'produse' %}">Produse</a></li>
+                        <ul class="submeniu">
+                            {% for cat in categorii_meniu %}
+                            <li>
+                                <a href="{% url 'categorie_detaliu' cat.nume_categorie %}">
+                                    {{ cat.nume_categorie }}
+                                    </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     <li><a href="{% url 'contact' %}">Contact</a></li>
                     <li><a href="{% url 'cos_virtual' %}">Cos Virtual</a></li>
                 </ul>

@@ -1,22 +1,18 @@
 import os
 import django
 from datetime import date
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proiect.settings')
 django.setup()
-
 from proiectapp.models import *
+
 
 def populate_tancuri():
     print("Incep popularea bazei de date cu TANCURI...")
-    
     categorii = [
         {'nume_categorie': 'Tancuri Americane', 'descriere': 'Modele de tancuri din Statele Unite', 'activa': True},
         {'nume_categorie': 'Tancuri Germane', 'descriere': 'Modele de tancuri germane', 'activa': True},
         {'nume_categorie': 'Tancuri Rusești', 'descriere': 'Modele de tancuri sovietice si rusesti', 'activa': True},
-        {'nume_categorie': 'Tancuri Britanice', 'descriere': 'Modele de tancuri britanice', 'activa': True},
-        {'nume_categorie': 'Tancuri Suedeze', 'descriere': 'Modele de tancuri suedeze', 'activa': True},
-        {'nume_categorie': 'Tancuri Japoneze', 'descriere': 'Modele de tancuri japoneze', 'activa': True},
+        {'nume_categorie': 'Tancuri Britanice', 'descriere': 'Modele de tancuri britanice', 'activa': True}
     ]
     
     for cat_data in categorii:
@@ -27,8 +23,7 @@ def populate_tancuri():
         {'nume_producator': 'Tamiya', 'tara_origine': 'Japonia', 'email': 'contact@tamiya.com', 'activ': True},
         {'nume_producator': 'Revell', 'tara_origine': 'Germania', 'email': 'info@revell.de', 'activ': True},
         {'nume_producator': 'Italeri', 'tara_origine': 'Italia', 'email': None, 'activ': True},
-        {'nume_producator': 'Dragon Models', 'tara_origine': 'Hong Kong', 'telefon': None, 'activ': True},
-        {'nume producator': 'Amazon', 'tara_origine': 'America', 'email': 'contact@amazon.com', 'activ': True}
+        {'nume_producator': 'Dragon Models', 'tara_origine': 'Hong Kong', 'telefon': None, 'activ': True}
     ]
     
     for prod_data in producatori:
@@ -36,22 +31,22 @@ def populate_tancuri():
         print(f"{'Creata' if created else 'Exista'} producator: {prod.nume_producator}")
     
     serii_data = [
-        {'nume_serie': 'Serie M1 Abrams', 'an_lansare': 2020, 'scala': '1:35', 'id_producator': Producator.objects.get(nume_producator='Tamiya')},
-        {'nume_serie': 'Serie Tiger I', 'an_lansare': 2019, 'scala': '1:48', 'id_producator': Producator.objects.get(nume_producator='Revell')},
-        {'nume_serie': 'Serie T-34', 'an_lansare': 2021, 'scala': '1:72', 'id_producator': Producator.objects.get(nume_producator='Italeri')},
-        {'nume_serie': 'Serie Sherman', 'an_lansare': 2018, 'scala': '1:35', 'id_producator': Producator.objects.get(nume_producator='Dragon Models')},
-        {'nume_serie': 'Serie Panther', 'an_lansare': 2022, 'scala': '1:100', 'id_producator': Producator.objects.get(nume_producator='Amazon')},
+        {'nume_serie': 'Tancuri WWII', 'an_lansare': 2020, 'scala': '1:35', 'id_producator': Producator.objects.get(nume_producator='Tamiya')},
+        {'nume_serie': 'Tancuri Razboiul Rece', 'an_lansare': 2019, 'scala': '1:48', 'id_producator': Producator.objects.get(nume_producator='Revell')},
+        {'nume_serie': 'Tancuri Usoare', 'an_lansare': 2021, 'scala': '1:72', 'id_producator': Producator.objects.get(nume_producator='Italeri')},
+        {'nume_serie': 'Tancuri Grele', 'an_lansare': 2018, 'scala': '1:35', 'id_producator': Producator.objects.get(nume_producator='Dragon Models')},
+        {'nume_serie': 'Tancuri Moderne', 'an_lansare': 2022, 'scala': '1:100', 'id_producator': Producator.objects.get(nume_producator='Tamiya')},
     ]
     
     for ser_data in serii_data:
         ser, created = Seria.objects.get_or_create(**ser_data)
         print(f"{'Creat' if created else 'Exista'} serie: {ser.nume_serie} ({ser.scala})")
     
-    seturi_accesorii = [
-        {'nume_set': 'Set Camuflaj Avansat', 'nr_piese': 3, 'compatibilitate': 'Toate modelele 1:35', 'tip_accesorii': 'CAM'},
+    seturi_accesorii = [ 
+        {'nume_set': 'Set Camuflaj Avansat', 'nr_piese': 3, 'compatibilitate': 'Toate modelele', 'tip_accesorii': 'CAM'},
         {'nume_set': 'Set Vopsele Militare', 'nr_piese': 8, 'compatibilitate': 'Culori standard NATO', 'tip_accesorii': 'VOP'},
-        {'nume_set': 'Set Lanturi Germane', 'nr_piese': 3, 'compatibilitate': 'Tancuri germane WWII', 'tip_accesorii': 'LANT'},
-        {'nume_set': 'Set Unelte Prezice', 'nr_piese': 12, 'compatibilitate': 'Modele la scară mică', 'tip_accesorii': 'UNEL'},
+        {'nume_set': 'Set Lanturi', 'nr_piese': 3, 'compatibilitate': 'Tancuri WWII', 'tip_accesorii': 'LANT'},
+        {'nume_set': 'Set Unelte', 'nr_piese': 12, 'compatibilitate': 'Modele la scara mica', 'tip_accesorii': 'UNEL'},
         {'nume_set': 'Set Display Premium', 'nr_piese': 5, 'compatibilitate': 'Toate modelele', 'tip_accesorii': 'ALT'},
     ]
     
@@ -63,7 +58,7 @@ def populate_tancuri():
         {'tip_material': 'Plastic Polistiren', 'culoare': 'Gri', 'textura': 'NETE', 'rezistent_la_apa': False},
         {'tip_material': 'Plastic ABS', 'culoare': 'Alb', 'textura': 'MAT', 'rezistent_la_apa': True},
         {'tip_material': 'Metal Turnat', 'culoare': None, 'textura': 'MAT', 'rezistent_la_apa': True},  # CULOARE NULL
-        {'tip_material': 'Resină Epoxidică', 'culoare': 'Transparent', 'textura': 'STR', 'rezistent_la_apa': True},
+        {'tip_material': 'Resina', 'culoare': 'Transparent', 'textura': 'STR', 'rezistent_la_apa': True},
         {'tip_material': 'Cauciuc Sintetic', 'culoare': 'Negru', 'textura': 'TEXT', 'rezistent_la_apa': False},
     ]
     
@@ -73,7 +68,7 @@ def populate_tancuri():
 
     tancuri = [
         {
-            'nume_figurina': 'M1A2 Abrams Main Battle Tank',
+            'nume_figurina': 'M1A2 Abrams',
             'pret': 450.00,
             'greutate': 1.2,
             'stoc_disponibil': 8,
@@ -83,10 +78,10 @@ def populate_tancuri():
             'descriere': 'Tanc american modern, scala detaliata 1:35',
             'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Americane'),
             'id_producator': Producator.objects.get(nume_producator='Tamiya'),
-            'id_serie': Seria.objects.get(nume_serie='Serie M1 Abrams'),
+            'id_serie': Seria.objects.get(nume_serie='Tancuri Moderne'),
         },
         {
-            'nume_figurina': 'German Tiger I Ausf.E',
+            'nume_figurina': 'German Tiger I',
             'pret': 380.50,
             'greutate': 0.9,
             'stoc_disponibil': 5,
@@ -96,7 +91,7 @@ def populate_tancuri():
             'descriere': 'Tanc german WWII, scala 1:48',
             'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Germane'),
             'id_producator': Producator.objects.get(nume_producator='Revell'),
-            'id_serie': Seria.objects.get(nume_serie='Serie Tiger I'),
+            'id_serie': Seria.objects.get(nume_serie='Tancuri WWII'),
         },
         {
             'nume_figurina': 'T-34/85',
@@ -107,9 +102,9 @@ def populate_tancuri():
             'tara_origine': 'RUS',
             'stare': 'NOU',
             'descriere': None,
-            'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Rusești'),
+            'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Rusesti'),
             'id_producator': Producator.objects.get(nume_producator='Italeri'),
-            'id_serie': Seria.objects.get(nume_serie='Serie T-34'),
+            'id_serie': Seria.objects.get(nume_serie='Tancuri WWII'),
         },
         {
             'nume_figurina': 'M4A3E8 Sherman',
@@ -122,7 +117,7 @@ def populate_tancuri():
             'descriere': 'Tanc Sherman varianta îmbunătățită',
             'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Americane'),
             'id_producator': Producator.objects.get(nume_producator='Dragon Models'),
-            'id_serie': Seria.objects.get(nume_serie='Serie Sherman'),
+            'id_serie': Seria.objects.get(nume_serie='Tancuri Grele'),
         },
         {
             'nume_figurina': 'Panther Ausf.G',
@@ -135,10 +130,10 @@ def populate_tancuri():
             'descriere': 'Tanc Panther model G, scală 1:100',
             'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Germane'),
             'id_producator': Producator.objects.get(nume_producator='Tamiya'),
-            'id_serie': Seria.objects.get(nume_serie='Serie Panther'),
+            'id_serie': Seria.objects.get(nume_serie='Tancuri WWII'),
         },
         {
-            'nume_figurina': 'Churchill Mk.IV',
+            'nume_figurina': 'Centurion Mk.III',
             'pret': 355.80,
             'greutate': 1.1,
             'stoc_disponibil': 6,
@@ -148,7 +143,7 @@ def populate_tancuri():
             'descriere': 'Tanc britanic de infanterie',
             'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Britanice'),
             'id_producator': Producator.objects.get(nume_producator='Revell'),
-            'id_serie': Seria.objects.get(nume_serie='Serie Tiger I'),  # Folosim aceeași serie pentru exemplu
+            'id_serie': Seria.objects.get(nume_serie='Tancuri Razboiul Rece'),
         },
     ]
     
@@ -170,7 +165,7 @@ def populate_tancuri():
                 through_defaults={'compatibil_perfect': True}
             )
         
-        elif tank.nume_figurina == 'German Tiger I Ausf.E':
+        elif tank.nume_figurina == 'German Tiger I':
             tank.materiale.add(
                 Material.objects.get(tip_material='Plastic ABS'),
                 through_defaults={'procentaj': 100.00}

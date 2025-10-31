@@ -1,0 +1,53 @@
+{% extends 'baza.html' %}
+{% load static %}
+
+{% block content %}
+<section id="produse-lista">
+    <h2>Produsele Noastre</h2>
+
+    <div>
+        Sorteaza dupa pret:
+        <a href="?sort=a">Crescator</a> | 
+        <a href="?sort=d">Descrescator</a> |
+        <a href="{% url 'produse' %}">Implicit (Nume)</a>
+    </div>
+
+    <div class="lista-produse">
+        {% for fig in page_obj %}
+            <article class="produs-card">
+            <h3><a href="{% url 'produs_detaliu' fig.id_figurina %}">{{ fig.nume_figurina }}</a></h3>
+
+            <p>Pret: {{ fig.pret }} RON</p>
+            <p>Stare: {{ fig.get_stare_display }}</p>
+
+            <p>Categorie: 
+                <span style="color: {{ fig.id_categorie.culoare }}; font-weight: bold;">●</span>
+                <a href="{% url 'categorie_detaliu' fig.id_categorie.nume_categorie %}">
+                    {{ fig.id_categorie.nume_categorie }}
+                </a>
+            </p>
+            </article>
+        {% empty %}
+        <p>Nu exista produse de afisat.</p>
+        {% endfor %}
+    </div>
+
+    <div class="paginare">
+        <span class="pas-paginare">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; prima</a>
+                <a href="?page={{ page_obj.previous_page_number }}">precedenta</a>
+            {% endif %}
+
+            <span class="pagina-curenta">
+                Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">urmatoarea</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">ultima &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</section>
+{% endblock %}

@@ -59,7 +59,7 @@
                     ID, Method, URL
                 </option>
             </select>
-            <small>Sau introdu manual: id,timestamp,method,path,ip_address</small>
+            <small>Sau introdu manual: id,timestamp,method,url,ip_address</small>
         </div>
         
         <div>
@@ -96,7 +96,7 @@
             <ul class="access-details">
                 {% for log in logs %}
                     <li>
-                        <strong>{{ log.timestamp }}</strong> - 
+                        <strong>{{ log.afis_data }}</strong> - 
                         {{ log.method }} <code>{{ log.path }}</code> - 
                         {{ log.ip_address }} (ID: {{ log.id }})
                     </li>
@@ -139,11 +139,11 @@
                             {% for column in table_columns %}
                                 <td>
                                     {% if column == 'id' %}{{ log.id }}
-                                    {% elif column == 'timestamp' %}{{ log.timestamp }}
+                                    {% elif column == 'timestamp' %}{{ log.afis_data }}
                                     {% elif column == 'method' %}{{ log.method }}
                                     {% elif column == 'path' %}{{ log.path }}
                                     {% elif column == 'ip_address' %}{{ log.ip_address }}
-                                    {% else %}{{ log|stringformat:"s" }}{% endif %}
+                                    {% endif %}
                                 </td>
                             {% endfor %}
                         </tr>
@@ -166,12 +166,12 @@
                 {% for log in logs_by_id %}
                     <div class="log-entry">
                         <strong>ID {{ log.id }}</strong> - 
-                        <strong>{{ log.timestamp }}</strong> - 
+                        <strong>{{ log.afis_data }}</strong> - 
                         {{ log.method }} <code>{{ log.path }}</code> - 
                         {{ log.ip_address }}
                     </div>
                 {% empty %}
-                    <p>Nu s-au găsit accesari pentru ID-urile specificate.</p>
+                    <p>Nu s-au gasit accesari pentru ID-urile specificate.</p>
                 {% endfor %}
             </div>
         </div>
@@ -230,7 +230,7 @@
     </div>
 
     <div class="section">
-    <a href="{% url 'info' %}">Vezi pagina de informații</a>
+    <a href="{% url 'info' %}">Vezi pagina de informatii</a>
 </div>
 
 </body>

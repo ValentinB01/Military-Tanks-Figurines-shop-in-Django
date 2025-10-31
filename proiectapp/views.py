@@ -7,27 +7,26 @@ from django.utils import timezone
 from .models import AccessLog
 from collections import OrderedDict
 import datetime
+from django.core.paginator import Paginator
 
 
-def home(request):
-    return HttpResponse("<h2> Bine ati venit! </h2>")
+# def home(request):
+#     return HttpResponse("<h2> Bine ati venit! </h2>")
 
-
-
-def info(request):
-    param = request.GET.get('data', None)
+# def info(request):
+#     param = request.GET.get('data', None)
     
-    sectiune_data = afis_data(param) if param else ""
+#     sectiune_data = afis_data(param) if param else ""
     
-    context ={
-        'ip_adress': get_ip_address(request)
-    }
+#     context ={
+#         'ip_address': get_ip_address(request)
+#     }
     
-    return render(request, 'info.html', context)
+#     return render(request, 'info.html', context)
 
-def log(request):
-    context = {'ip_address': get_ip_address(request)}
-    return render(request, 'log.html', context)
+# def log(request):
+#     context = {'ip_address': get_ip_address(request)}
+#     return render(request, 'log.html', context)
 
 def afis_data(parametru=None):
     acum = timezone.localtime(timezone.now())
@@ -55,15 +54,6 @@ def afis_data(parametru=None):
     <p>{continut}<p>
     </section>
     """
-    
-
-def afis_template2(request):
-    return render(request, "proiect/simplu.html"
-    )
-    
-    
-    
-    
     
 def log_view(request):
     n = request.GET.get('ultimele')
@@ -124,20 +114,38 @@ def log_view(request):
     show_table = False
     table_columns = []
     
+    all_valid_model_columns = ['id', 'timestamp', 'method', 'path', 'ip_address']
+
     if tabel_param:
         show_table = True
         if tabel_param == 'tot':
-            table_columns = ['id', 'timestamp', 'method', 'path', 'ip_address']
+            table_columns = all_valid_model_columns
         else:
-            table_columns = [col.strip() for col in tabel_param.split(',')]
-            valid_columns = ['id', 'timestamp', 'method', 'path', 'ip_address']
-            table_columns = [col for col in table_columns if col in valid_columns]
+            valid_columns_map = {
+                'id': 'id',
+                'timestamp': 'timestamp',
+                'method': 'method',
+                'path': 'path',
+                'url': 'path',
+                'ip_address': 'ip_address'
+            }
+            
+            requested_columns = [col.strip() for col in tabel_param.split(',')]
+            temp_cols = []
+            for col_name in requested_columns:
+                real_col_name = valid_columns_map.get(col_name)
+                if real_col_name:
+                    temp_cols.append(real_col_name)
+            
+            table_columns = list(OrderedDict.fromkeys(temp_cols))
             
             if not table_columns:
-                table_columns = valid_columns
+                table_columns = all_valid_model_columns
+            # table_columns = [col.strip() for col in tabel_param.split(',')]
+            # valid_columns = ['id', 'timestamp', 'method', 'path', 'ip_address']
+            # table_columns = [col for col in table_columns if col in valid_columns]
 
     table_data = logs_by_id if logs_by_id else logs
-    
     
     page_stats = AccessLog.objects.values('path').annotate(
         access_count=Count('id')
@@ -228,3 +236,44 @@ def contact(request):
 def cos_virtual(request):
     context = {'ip_address': get_ip_address(request)}
     return render(request, 'in_lucru.html', context)
+
+
+
+def produse(request):
+    figurine_list = Figurina.objects.select_related('id_categorie'). all()
+    
+    sort_by = request.GET.get('sort')
+    if sort_by == 'a':
+        figurine_list = figurine_list.order_by('pret')
+    elif sort_by == 'd':
+        figurine_list = figurine_list.order_by('-pret')
+    else:
+        figurine_list = figurine_list.order_by('nume_figurina')
+        
+    paginator = Paginator(figurine_list, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'ip_adress': get_ip_address(request)
+    }
+    return render(request, 'produse.html', context)
+
+def produs_detaliu(request, id_figurina):
+    figurina = get_object_or_404(Figurina, id_figurina=id_figurina)
+    context = {
+        'fig': figurina,
+        'ip_address': get_ip_address(request)
+    }
+    return render(request, 'produs_detaliu.html', context)
+
+def categorie_detaliu(request, nume_categorie):
+    categorie = get_object_or_404(Categorie, nume_categorie=nume_categorie)
+    produse_in_categorie = Figurina.objects.filter(id_categorie=categorie)
+    context = {
+        'cat': categorie,
+        'produse': produse_in_categorie,
+        'ip_address': get_ip_address(request)
+    }
+    return render(request, 'categorie_detaliu.html', context)

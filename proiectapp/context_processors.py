@@ -1,3 +1,5 @@
+from .models import Categorie
+
 def ip_address(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
@@ -5,3 +7,7 @@ def ip_address(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return {'ip_address': ip}
+
+def categorii_meniu(request):
+    categorii = Categorie.objects.filter(activa=True)
+    return {'categorii_meniu': categorii}

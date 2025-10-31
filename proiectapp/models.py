@@ -8,6 +8,7 @@ class AccessLog(models.Model):
     ip_address = models.GenericIPAddressField()
     user_agent = models.TextField(blank=True, null=True)
     path = models.CharField(max_length=500)
+    method = models.CharField(max_length=10, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -19,8 +20,7 @@ class AccessLog(models.Model):
         return f"{self.ip_address} - {self.path} - {self.timestamp}"
     
     def afis_data(self):
-        acum = timezone.localtime(timezone.now())
-        
+        acum = timezone.localtime(self.timestamp)        
         zile_sapt = ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"]
         luni = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
                 "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"]
@@ -40,6 +40,12 @@ class Categorie(models.Model):
     descriere = models.TextField(blank=True, null=True)
     activa = models.BooleanField(default=True)
 
+    culoare = models.CharField(
+        max_length=7, 
+        default='#333333', 
+        help_text="#1F5D7D"
+    )
+    
     class Meta:
         verbose_name = "Categorie"
         verbose_name_plural = "Categorii"
@@ -159,13 +165,16 @@ class Figurina(models.Model):
         ('RUS', 'Rusia'),
         ('UK', 'Marea Britanie'),
         ('JAP', 'Japonia'),
-        ('FR', 'Franta'),
+        ('SU', 'Suedia'),
+        ('CHN', 'China'),
+        ('FRA', 'Franta'),
+        ('ITA', 'Italia')
     ]
     
     id_figurina = models.AutoField(primary_key=True)
     nume_figurina = models.CharField(max_length=100)
     pret = models.DecimalField(max_digits=10, decimal_places=2)
-    greutate = models.DecimalField(max_digits=6, decimal_places=2, help_text="Greutate în kg")
+    greutate = models.DecimalField(max_digits=6, decimal_places=2, help_text="Greutate in kg")
     stoc_disponibil = models.IntegerField(default=0)
     data_lansare = models.DateField()
     data_adaugare = models.DateTimeField(auto_now_add=True)#
@@ -180,6 +189,12 @@ class Figurina(models.Model):
         default='NOU'
     )
     descriere = models.TextField(blank=True, null=True)
+    
+    imagine = models.ImageField(
+        upload_to='produse_imagini/',
+        null=True,
+        blank=True
+    )
     
     # ForeignKey
     id_categorie = models.ForeignKey(Categorie, on_delete=models.CASCADE)

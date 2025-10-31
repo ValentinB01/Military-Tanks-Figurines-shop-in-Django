@@ -1,0 +1,23 @@
+{% extends 'baza.html' %}
+{% load static %}
+
+{% block content %}
+<section id="categorie-detaliu">
+    <h2>Categorie: {{ cat.nume_categorie }}</h2>
+    <p style="font-size: 2rem; color: {{ cat.culoare }};">■</p>
+    <p>{{ cat.descriere|default:"Fara descriere." }}</p>
+    <hr>
+
+    <h3>Produse din aceasta categorie:</h3>
+    <ul>
+        {% for p in produse %}
+        <li>
+            <a href="{% url 'produs_detaliu' p.id_figurina %}">{{ p.nume_figurina }}</a> 
+            - {{ p.pret }} RON
+        </li>
+        {% empty %}
+        <li>Nu exista produse în aceasta categorie.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

@@ -12,6 +12,7 @@ class LoggingMiddleware: #salveaza automat cererile in baza de date
                 ip_address=self.get_client_ip(request),
                 user_agent=request.META.get('HTTP_USER_AGENT', ''),
                 path=request.path,
+                method=request.method,
                 user=request.user if request.user.is_authenticated else None
             )
         except Exception as e:

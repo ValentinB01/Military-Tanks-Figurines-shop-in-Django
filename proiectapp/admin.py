@@ -61,6 +61,8 @@ class FigurinaAdmin(admin.ModelAdmin):
         'data_adaugare'
     ]
     
+    list_per_page = 5
+    
     list_filter = [
         'tara_origine',
         'stare', 
@@ -73,6 +75,8 @@ class FigurinaAdmin(admin.ModelAdmin):
         'nume_figurina',
         'descriere'
     ]
+    
+    ordering = ['-data_adaugare']
     
     list_editable = [
         'pret',
@@ -90,7 +94,8 @@ class FigurinaAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Informatii de baza', {
             'fields': (
-                'nume_figurina', 
+                'nume_figurina',
+                'imagine', 
                 'pret', 
                 'greutate', 
                 'stoc_disponibil',
@@ -112,15 +117,3 @@ class FigurinaAdmin(admin.ModelAdmin):
             'classes': ('collapse',)  
         }),
     )
-
-@admin.register(FigurinaMaterial)
-class FigurinaMaterialAdmin(admin.ModelAdmin):
-    list_display = ['figurina', 'material', 'procentaj']
-    list_filter = ['material']
-    search_fields = ['figurina__nume_figurina']
-
-@admin.register(FigurinaSetAccesorii)
-class FigurinaSetAccesoriiAdmin(admin.ModelAdmin):
-    list_display = ['figurina', 'set_accesorii', 'compatibil_perfect', 'data_asociere']
-    list_filter = ['compatibil_perfect', 'set_accesorii']
-    readonly_fields = ['data_asociere']
