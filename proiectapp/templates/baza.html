@@ -8,9 +8,12 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header>
+    {% comment %} <header>
         <div class="header-content">
-            <h1>Figurine Tancuri Militare</h1>
+            <a href="{% url 'index' %}" class="logo-area">
+                <img src="{% static 'imagini/logo.png' %}" alt="Tankeria Logo" class="logo-img">
+                <span class="logo-text">TANKERIA</span>
+            </a>
             <nav>
                 <ul class="meniu-derulant">
                     <li><a href="{% url 'index' %}">Acasa</a>
@@ -20,25 +23,122 @@
                             <li><a href="#oferta-speciala">Oferta speciala</a></li>
                         </ul>
                     </li>
+                    <li><a href="{% url 'cos_virtual' %}">Cosul Meu</a></li>
                     <li><a href="{% url 'despre' %}">Despre</a>
                         <ul class="submeniu">
                             <li><a href="#istoric">Istoric</a></li>
                             <li><a href="#colectie">Colectia noastra</a></li>
                         </ul>
                     </li>
-                    <li><a href="{% url 'produse' %}">Produse</a></li>
-                        <ul class="submeniu">
+                    <li><a href="{% url 'contact' %}">Contact</a></li>                        
+                </li>
+                </ul>
+                    <li><a href="{% url 'produse' %}" class="btn-explore">Exploreaza Produsele</a></li>
+                    <ul class="submeniu">
                             {% for cat in categorii_meniu %}
                             <li>
-                                <a href="{% url 'categorie_detaliu' cat.nume_categorie %}">
+                                <a href="{% url 'categorie_detaliu' cat.nume_categorie %}"
+                                    class="link-categorie"
+                                    style="--culoare-baza: {{ cat.culoare }}; --culoare-activa: {{ cat.culoare_activa }};">
                                     {{ cat.nume_categorie }}
-                                    </a>
+                                </a>
                             </li>
                             {% endfor %}
                         </ul>
+            </nav>
+        </div>
+    </header>  {% endcomment %}
+
+    {% comment %} <header class="new-header">
+        <div class="header-content">
+            <a href="{% url 'index' %}" class="logo-area">
+                <img src="{% static 'imagini/logo.png' %}" alt="Tankeria Logo" class="logo-img">
+                <span class="logo-text">TANKERIA</span>
+            </a>
+            
+            <nav class="header-nav">
+                <ul class="meniu-derulant">
+                    <li><a href="{% url 'index' %}">Acasa</a>
+                        <ul class="submeniu">
+                            <li><a href="#cele-mai-populare">Cele mai populare</a></li>
+                            <li><a href="#noutati">Noutati</a></li>
+                            <li><a href="#oferta-speciala">Oferta speciala</a></li>
+                        </ul>
+                    </li>
+                    
+                    <li><a href="{% url 'produse' %}">Categorii</a>
+                        <ul class="submeniu">
+                            {% for cat in categorii_meniu %}
+                            <li>
+                                <a href="{% url 'categorie_detaliu' cat.nume_categorie %}"
+                                    class="link-categorie"
+                                    style="--culoare-baza: {{ cat.culoare }}; --culoare-activa: {{ cat.culoare_activa }};">
+                                    {{ cat.nume_categorie }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    
+                    <li><a href="{% url 'despre' %}">Despre</a>
+                        <ul class="submeniu">
+                            <li><a href="#istoric">Istoric</a></li>
+                            <li><a href="#colectie">Colectia noastra</a></li>
+                        </ul>
+                    </li>
                     <li><a href="{% url 'contact' %}">Contact</a></li>
-                    <li><a href="{% url 'cos_virtual' %}">Cos Virtual</a></li>
+                    <li><a href="{% url 'cos_virtual' %}">Cosul Meu</a></li>
                 </ul>
+                
+                <a href="{% url 'produse' %}" class="btn-explore">Exploreaza Produsele</a>
+            </nav>
+        </div>
+    </header> {% endcomment %}
+
+    <header class="new-header">
+        <div class="header-content">
+            <a href="{% url 'index' %}" class="logo-area">
+                <img src="{% static 'imagini/logo.png' %}" alt="Tankeria Logo" class="logo-img">
+                <span class="logo-text">TANKERIA</span>
+            </a>
+            
+            <nav class="header-nav">
+                <ul class="meniu-derulant">
+                    <li><a href="{% url 'index' %}">Acasa</a>
+                        <ul class="submeniu">
+                            <li><a href="#cele-mai-populare">Cele mai populare</a></li>
+                            <li><a href="#noutati">Noutati</a></li>
+                            <li><a href="#oferta-speciala">Oferta speciala</a></li>
+                        </ul>
+                    </li>
+                    
+                    <li><a href="{% url 'produse' %}">Categorii</a>
+                        <ul class="submeniu">
+                            {% for cat in categorii_meniu %}
+                            <li>
+                                <a href="{% url 'categorie_detaliu' cat.nume_categorie %}"
+                                    class="link-categorie"
+                                    style="--culoare-baza: {{ cat.culoare }}; --culoare-activa: {{ cat.culoare_activa }};">
+                                    {{ cat.nume_categorie }}
+                                </a>
+                            </li>
+                            {% empty %}
+                            <li><a href="#">Nicio categorie</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    
+                    <li><a href="{% url 'despre' %}">Despre</a>
+                        <ul class="submeniu">
+                            <li><a href="#istoric">Istoric</a></li>
+                            <li><a href="#colectie">Colectia noastra</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    <li><a href="{% url 'cos_virtual' %}">Cosul Meu</a></li>
+                </ul>
+                
+                <a href="{% url 'produse' %}" class="btn-explore">Exploreaza Produsele</a>
             </nav>
         </div>
     </header>

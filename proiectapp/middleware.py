@@ -1,12 +1,11 @@
 from .models import AccessLog
 
-class LoggingMiddleware: #salveaza automat cererile in baza de date
+class LoggingMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         response = self.get_response(request)
-        
         try:
             AccessLog.objects.create(
                 ip_address=self.get_client_ip(request),
@@ -17,7 +16,6 @@ class LoggingMiddleware: #salveaza automat cererile in baza de date
             )
         except Exception as e:
             print(f"Eroare la logare acces: {e}")
-        
         return response
 
     def get_client_ip(self, request):

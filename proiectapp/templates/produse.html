@@ -7,27 +7,38 @@
 
     <div>
         Sorteaza dupa pret:
-        <a href="?sort=a">Crescator</a> | 
-        <a href="?sort=d">Descrescator</a> |
-        <a href="{% url 'produse' %}">Implicit (Nume)</a>
+        <a href="?sort=a{% if params_sorting %}&{{ params_sorting }}{% endif %}">Crescator</a> | 
+        <a href="?sort=d{% if params_sorting %}&{{ params_sorting }}{% endif %}">Descrescator</a> |
+        <a href="?{% if params_sorting %}&{{ params_sorting }}{% endif %}">Implicit (Nume)</a>
     </div>
 
     <div class="lista-produse">
         {% for fig in page_obj %}
-            <article class="produs-card">
-            <h3><a href="{% url 'produs_detaliu' fig.id_figurina %}">{{ fig.nume_figurina }}</a></h3>
-
-            <p>Pret: {{ fig.pret }} RON</p>
-            <p>Stare: {{ fig.get_stare_display }}</p>
-
-            <p>Categorie: 
-                <span style="color: {{ fig.id_categorie.culoare }}; font-weight: bold;">●</span>
-                <a href="{% url 'categorie_detaliu' fig.id_categorie.nume_categorie %}">
-                    {{ fig.id_categorie.nume_categorie }}
-                </a>
-            </p>
+            <article class="produs-card" style="text-align: center;">
+                <h3><a href="{% url 'produs_detaliu' fig.id_figurina %}">{{ fig.nume_figurina }}</a></h3>
+                
+                {% if fig.imagine %}
+                    <a href="{% url 'produs_detaliu' fig.id_figurina %}">
+                        <img src="{{ fig.imagine.url }}" alt="{{ fig.nume_figurina }}" 
+                            style="max-width: 250px; height: auto; border-radius: 5px; display: block; margin: 10px auto;">
+                    </a>
+                {% else %}
+                    <a href="{% url 'produs_detaliu' fig.id_figurina %}">
+                        <img src="{% static 'imagini/placeholder.png' %}" alt="Imagine indisponibila" 
+                            style="max-width: 250px; height: auto; border-radius: 5px; display: block; margin: 10px auto;">
+                    </a>
+                {% endif %}
+                <p>Pret: {{ fig.pret }} RON</p>
+                <p>Stare: {{ fig.get_stare_display }}</p>
+                <p>Categorie: 
+                    <a href="{% url 'categorie_detaliu' fig.id_categorie.nume_categorie %}"
+                        class="link-categorie" 
+                        style="--culoare-baza: {{ fig.id_categorie.culoare }}; --culoare-activa: {{ fig.id_categorie.culoare_activa }};">
+                        {{ fig.id_categorie.nume_categorie }}
+                    </a>
+                </p>
             </article>
-        {% empty %}
+            {% empty %}
         <p>Nu exista produse de afisat.</p>
         {% endfor %}
     </div>
@@ -35,8 +46,8 @@
     <div class="paginare">
         <span class="pas-paginare">
             {% if page_obj.has_previous %}
-                <a href="?page=1">&laquo; prima</a>
-                <a href="?page={{ page_obj.previous_page_number }}">precedenta</a>
+                <a href="?page=1{% if params_pagination %}&{{ params_pagination }}{% endif %}">&laquo; prima</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">precedenta</a>
             {% endif %}
 
             <span class="pagina-curenta">
@@ -44,8 +55,8 @@
             </span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">urmatoarea</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">ultima &raquo;</a>
+                <a href="?page={{ page_obj.next_page_number }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">urmatoarea</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">ultima &raquo;</a>
             {% endif %}
         </span>
     </div>

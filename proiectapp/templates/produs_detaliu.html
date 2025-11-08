@@ -17,8 +17,10 @@
     <p><strong>Stoc:</strong> {{ fig.stoc_disponibil }} buc.</p>
     <p><strong>Producator:</strong> {{ fig.id_producator.nume_producator }}</p>
     <p><strong>Categorie:</strong> 
-        <a href="{% url 'categorie_detaliu' fig.id_categorie.nume_categorie %}">
-            {{ fig.id_categorie.nume_categorie }}
+        <a href="{% url 'categorie_detaliu' fig.id_categorie.nume_categorie %}"
+                class="link-categorie"
+                style="--culoare-baza: {{ fig.id_categorie.culoare }}; --culoare-activa: {{ fig.id_categorie.culoare_activa }};">
+                {{ fig.id_categorie.nume_categorie }}
         </a>
     </p>
     <p><strong>Serie:</strong> {{ fig.id_serie.nume_serie }} ({{ fig.id_serie.scala }})</p>

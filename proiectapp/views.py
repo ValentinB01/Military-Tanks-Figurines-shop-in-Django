@@ -10,57 +10,11 @@ import datetime
 from django.core.paginator import Paginator
 
 
-# def home(request):
-#     return HttpResponse("<h2> Bine ati venit! </h2>")
-
-# def info(request):
-#     param = request.GET.get('data', None)
-    
-#     sectiune_data = afis_data(param) if param else ""
-    
-#     context ={
-#         'ip_address': get_ip_address(request)
-#     }
-    
-#     return render(request, 'info.html', context)
-
-# def log(request):
-#     context = {'ip_address': get_ip_address(request)}
-#     return render(request, 'log.html', context)
-
-def afis_data(parametru=None):
-    acum = timezone.localtime(timezone.now())
-    
-    zile_sapt = ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"]
-    luni = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
-            "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"]
-    
-    zi_sapt = zile_sapt[acum.weekday()]
-    zi_luna = acum.day
-    luna = luni[acum.month -1]
-    an = acum.year
-    ora = acum.strftime("%H:%M:%S")
-    
-    if parametru == "zi":
-        continut = f"{zi_sapt}, {zi_luna} {luna} {an}"
-    elif parametru == "timp":
-        continut = f"{ora}"
-    else:
-        continut = f"{zi_sapt}, {zi_luna} {luna} {an}, ora {ora}"
-
-    return f"""
-    <section>
-    <h2>Data si ora <h2>
-    <p>{continut}<p>
-    </section>
-    """
-    
 def log_view(request):
-    n = request.GET.get('ultimele')
-    
     all_logs = AccessLog.objects.all().order_by('-timestamp')
     total_logs = all_logs.count()
 
+    n = request.GET.get('ultimele')
     if n:
         try:
             n = int(n)
@@ -80,10 +34,8 @@ def log_view(request):
         logs = all_logs
         error_message = None
         
-        
     accesari_param = request.GET.get('accesari')
     show_access_count = accesari_param == 'nr'
-    
     show_access_details = accesari_param == 'detalii'
     
     ids_from_params = request.GET.getlist('iduri')
@@ -107,15 +59,11 @@ def log_view(request):
             logs_by_id = AccessLog.objects.filter(id__in=all_ids)
             log_dict = {log.id: log for log in logs_by_id}
             logs_by_id = [log_dict[log_id] for log_id in all_ids if log_id in log_dict]
-
-
-
+            
     tabel_param = request.GET.get('tabel')
     show_table = False
     table_columns = []
-    
     all_valid_model_columns = ['id', 'timestamp', 'method', 'path', 'ip_address']
-
     if tabel_param:
         show_table = True
         if tabel_param == 'tot':
@@ -129,7 +77,6 @@ def log_view(request):
                 'url': 'path',
                 'ip_address': 'ip_address'
             }
-            
             requested_columns = [col.strip() for col in tabel_param.split(',')]
             temp_cols = []
             for col_name in requested_columns:
@@ -141,16 +88,14 @@ def log_view(request):
             
             if not table_columns:
                 table_columns = all_valid_model_columns
-            # table_columns = [col.strip() for col in tabel_param.split(',')]
-            # valid_columns = ['id', 'timestamp', 'method', 'path', 'ip_address']
-            # table_columns = [col for col in table_columns if col in valid_columns]
 
     table_data = logs_by_id if logs_by_id else logs
+    
+    
     
     page_stats = AccessLog.objects.values('path').annotate(
         access_count=Count('id')
     ).order_by('access_count')
-    
     if page_stats:
         least_accessed = page_stats.first()
         most_accessed = page_stats.last()
@@ -176,13 +121,10 @@ def log_view(request):
     return render(request, 'log.html', context)
 
 
-
 def info_view(request):
     params = request.GET
-    
     param_count = len(params)
     param_names = list(params.keys())
-    
     param_details = []
     for name, values in params.lists():
         param_details.append({
@@ -199,11 +141,6 @@ def info_view(request):
     return render(request, 'info.html', context)
 
 
-
-
-
-
-
 def get_ip_address(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
@@ -211,7 +148,6 @@ def get_ip_address(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
-
 
 def index(request):
     context = {'ip_address': get_ip_address(request)}
@@ -241,7 +177,9 @@ def cos_virtual(request):
 
 def produse(request):
     figurine_list = Figurina.objects.select_related('id_categorie'). all()
-    
+
+    params_get = request.GET.copy()
+
     sort_by = request.GET.get('sort')
     if sort_by == 'a':
         figurine_list = figurine_list.order_by('pret')
@@ -249,14 +187,24 @@ def produse(request):
         figurine_list = figurine_list.order_by('-pret')
     else:
         figurine_list = figurine_list.order_by('nume_figurina')
-        
+    
     paginator = Paginator(figurine_list, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    params_for_pagination = params_get.copy()
+    if 'page' in params_for_pagination:
+        del params_for_pagination['page']
+    
+    params_for_sorting = params_get.copy()
+    if 'sort' in params_for_sorting:
+        del params_for_sorting['sort']
+
     context = {
         'page_obj': page_obj,
-        'ip_adress': get_ip_address(request)
+        'params_pagination': params_for_pagination.urlencode(),
+        'params_sorting': params_for_sorting.urlencode(),
+        'ip_address': get_ip_address(request)
     }
     return render(request, 'produse.html', context)
 

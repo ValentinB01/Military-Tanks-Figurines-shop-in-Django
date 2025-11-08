@@ -1,9 +1,15 @@
 import os
 import django
 from datetime import date
+import sys
+from pathlib import Path
+CURRENT_FILE_PATH = Path(__file__).resolve()
+BASE_DIR = CURRENT_FILE_PATH.parent.parent
+sys.path.append(str(BASE_DIR))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proiect.settings')
 django.setup()
-from proiectapp.models import *
+from proiectapp.models import * 
+
 
 
 def populate_tancuri():
@@ -45,7 +51,7 @@ def populate_tancuri():
     seturi_accesorii = [ 
         {'nume_set': 'Set Camuflaj Avansat', 'nr_piese': 3, 'compatibilitate': 'Toate modelele', 'tip_accesorii': 'CAM'},
         {'nume_set': 'Set Vopsele Militare', 'nr_piese': 8, 'compatibilitate': 'Culori standard NATO', 'tip_accesorii': 'VOP'},
-        {'nume_set': 'Set Lanturi', 'nr_piese': 3, 'compatibilitate': 'Tancuri WWII', 'tip_accesorii': 'LANT'},
+        {'nume_set': 'Set Lanturi de Otel', 'nr_piese': 3, 'compatibilitate': 'Tancuri WWII', 'tip_accesorii': 'LANT'},
         {'nume_set': 'Set Unelte', 'nr_piese': 12, 'compatibilitate': 'Modele la scara mica', 'tip_accesorii': 'UNEL'},
         {'nume_set': 'Set Display Premium', 'nr_piese': 5, 'compatibilitate': 'Toate modelele', 'tip_accesorii': 'ALT'},
     ]
@@ -75,20 +81,20 @@ def populate_tancuri():
             'data_lansare': date(2023, 5, 15),
             'tara_origine': 'USA',
             'stare': 'NOU',
-            'descriere': 'Tanc american modern, scala detaliata 1:35',
+            'descriere': None,
             'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Americane'),
             'id_producator': Producator.objects.get(nume_producator='Tamiya'),
             'id_serie': Seria.objects.get(nume_serie='Tancuri Moderne'),
         },
         {
-            'nume_figurina': 'German Tiger I',
+            'nume_figurina': 'Tiger I',
             'pret': 380.50,
             'greutate': 0.9,
             'stoc_disponibil': 5,
             'data_lansare': date(2022, 11, 20),
             'tara_origine': 'GER', 
             'stare': 'COL',
-            'descriere': 'Tanc german WWII, scala 1:48',
+            'descriere': None,
             'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Germane'),
             'id_producator': Producator.objects.get(nume_producator='Revell'),
             'id_serie': Seria.objects.get(nume_serie='Tancuri WWII'),
@@ -114,7 +120,7 @@ def populate_tancuri():
             'data_lansare': date(2021, 8, 30),
             'tara_origine': 'USA',
             'stare': 'FOL',
-            'descriere': 'Tanc Sherman varianta îmbunătățită',
+            'descriere': 'Tanc Sherman varianta îmbunatatita',
             'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Americane'),
             'id_producator': Producator.objects.get(nume_producator='Dragon Models'),
             'id_serie': Seria.objects.get(nume_serie='Tancuri Grele'),
@@ -127,7 +133,7 @@ def populate_tancuri():
             'data_lansare': date(2023, 7, 5),
             'tara_origine': 'GER',
             'stare': 'RES',
-            'descriere': 'Tanc Panther model G, scală 1:100',
+            'descriere': None,
             'id_categorie': Categorie.objects.get(nume_categorie='Tancuri Germane'),
             'id_producator': Producator.objects.get(nume_producator='Tamiya'),
             'id_serie': Seria.objects.get(nume_serie='Tancuri WWII'),
@@ -165,37 +171,25 @@ def populate_tancuri():
                 through_defaults={'compatibil_perfect': True}
             )
         
-        elif tank.nume_figurina == 'German Tiger I':
+        elif tank.nume_figurina == 'Tiger I':
             tank.materiale.add(
                 Material.objects.get(tip_material='Plastic ABS'),
                 through_defaults={'procentaj': 100.00}
             )
             tank.seturi_accesorii.add(
-                SetAccessorii.objects.get(nume_set='Set Lanturi Germane'),
+                SetAccessorii.objects.get(nume_set='Set Lanturi de Otel'),
                 through_defaults={'compatibil_perfect': True}
             )
         
-        elif tank.nume_figurina == 'T-34/85 Medium Tank':
+        elif tank.nume_figurina == 'T-34/85':
             tank.materiale.add(
                 Material.objects.get(tip_material='Plastic Polistiren'),
                 through_defaults={'procentaj': 70.00}
             )
             tank.materiale.add(
-                Material.objects.get(tip_material='Resina Epoxidica'),
+                Material.objects.get(tip_material='Resina'),
                 through_defaults={'procentaj': 30.00}
             )
-    
-    print("\n" + "="*50)
-    print("POPULAREA FINALIZATA CU SUCCES!")
-    print("="*50)
-    print(f"  Statistici:")
-    print(f"   • {Categorie.objects.count()} categorii")
-    print(f"   • {Producator.objects.count()} producători") 
-    print(f"   • {Seria.objects.count()} serii")
-    print(f"   • {SetAccessorii.objects.count()} seturi accesorii")
-    print(f"   • {Material.objects.count()} materiale")
-    print(f"   • {Figurina.objects.count()} figurine (tancuri)")
-    print("="*50)
-
+            
 if __name__ == '__main__':
     populate_tancuri()

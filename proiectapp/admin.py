@@ -4,8 +4,10 @@ from .models import *
 @admin.register(Categorie)
 class CategorieAdmin(admin.ModelAdmin):
     list_display = ['id_categorie', 'nume_categorie', 'activa']
+    list_per_page = 5
     list_filter = ['activa']
-    search_fields = ['nume_categorie']
+    search_fields = ['id_categorie', 'nume_categorie']
+    ordering = ['nume_categorie']
     list_editable = ['activa']
 
 @admin.register(Producator)
@@ -19,7 +21,7 @@ class ProducatorAdmin(admin.ModelAdmin):
 class SeriaAdmin(admin.ModelAdmin):
     list_display = ['id_serie', 'nume_serie', 'scala', 'an_lansare', 'disponibilitate', 'id_producator']
     list_filter = ['scala', 'disponibilitate', 'an_lansare', 'id_producator']
-    search_fields = ['nume_serie']
+    search_fields = ['id_serie', 'nume_serie']
     list_editable = ['disponibilitate']
 
 @admin.register(SetAccessorii)
@@ -34,7 +36,6 @@ class MaterialAdmin(admin.ModelAdmin):
     list_display = ['id_material', 'tip_material', 'culoare', 'textura', 'rezistent_la_apa']
     list_filter = ['textura', 'rezistent_la_apa']
     search_fields = ['tip_material', 'culoare']
-
 
 class FigurinaMaterialInline(admin.TabularInline):
     model = FigurinaMaterial
@@ -60,9 +61,7 @@ class FigurinaAdmin(admin.ModelAdmin):
         'id_categorie',
         'data_adaugare'
     ]
-    
     list_per_page = 5
-    
     list_filter = [
         'tara_origine',
         'stare', 
@@ -70,27 +69,20 @@ class FigurinaAdmin(admin.ModelAdmin):
         'id_producator',
         'data_lansare'
     ]
-    
     search_fields = [
         'nume_figurina',
         'descriere'
     ]
-    
     ordering = ['-data_adaugare']
-    
     list_editable = [
         'pret',
         'stoc_disponibil'
     ]
-    
     readonly_fields = [
         'data_adaugare'
     ]
-    
     list_select_related = ['id_categorie', 'id_producator', 'id_serie']
-    
     inlines = [FigurinaMaterialInline, FigurinaSetAccesoriiInline]
-    
     fieldsets = (
         ('Informatii de baza', {
             'fields': (
