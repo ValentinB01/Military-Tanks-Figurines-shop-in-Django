@@ -6,132 +6,32 @@
     <title>Figurine Tancuri Militare</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    {% comment %} <header>
-        <div class="header-content">
-            <a href="{% url 'index' %}" class="logo-area">
-                <img src="{% static 'imagini/logo.png' %}" alt="Tankeria Logo" class="logo-img">
-                <span class="logo-text">TANKERIA</span>
-            </a>
-            <nav>
-                <ul class="meniu-derulant">
-                    <li><a href="{% url 'index' %}">Acasa</a>
-                        <ul class="submeniu">
-                            <li><a href="#cele-mai-populare">Cele mai populare</a></li>
-                            <li><a href="#noutati">Noutati</a></li>
-                            <li><a href="#oferta-speciala">Oferta speciala</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="{% url 'cos_virtual' %}">Cosul Meu</a></li>
-                    <li><a href="{% url 'despre' %}">Despre</a>
-                        <ul class="submeniu">
-                            <li><a href="#istoric">Istoric</a></li>
-                            <li><a href="#colectie">Colectia noastra</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="{% url 'contact' %}">Contact</a></li>                        
-                </li>
-                </ul>
-                    <li><a href="{% url 'produse' %}" class="btn-explore">Exploreaza Produsele</a></li>
-                    <ul class="submeniu">
-                            {% for cat in categorii_meniu %}
-                            <li>
-                                <a href="{% url 'categorie_detaliu' cat.nume_categorie %}"
-                                    class="link-categorie"
-                                    style="--culoare-baza: {{ cat.culoare }}; --culoare-activa: {{ cat.culoare_activa }};">
-                                    {{ cat.nume_categorie }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-            </nav>
-        </div>
-    </header>  {% endcomment %}
-
-    {% comment %} <header class="new-header">
-        <div class="header-content">
-            <a href="{% url 'index' %}" class="logo-area">
-                <img src="{% static 'imagini/logo.png' %}" alt="Tankeria Logo" class="logo-img">
-                <span class="logo-text">TANKERIA</span>
-            </a>
-            
-            <nav class="header-nav">
-                <ul class="meniu-derulant">
-                    <li><a href="{% url 'index' %}">Acasa</a>
-                        <ul class="submeniu">
-                            <li><a href="#cele-mai-populare">Cele mai populare</a></li>
-                            <li><a href="#noutati">Noutati</a></li>
-                            <li><a href="#oferta-speciala">Oferta speciala</a></li>
-                        </ul>
-                    </li>
-                    
-                    <li><a href="{% url 'produse' %}">Categorii</a>
-                        <ul class="submeniu">
-                            {% for cat in categorii_meniu %}
-                            <li>
-                                <a href="{% url 'categorie_detaliu' cat.nume_categorie %}"
-                                    class="link-categorie"
-                                    style="--culoare-baza: {{ cat.culoare }}; --culoare-activa: {{ cat.culoare_activa }};">
-                                    {{ cat.nume_categorie }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    
-                    <li><a href="{% url 'despre' %}">Despre</a>
-                        <ul class="submeniu">
-                            <li><a href="#istoric">Istoric</a></li>
-                            <li><a href="#colectie">Colectia noastra</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="{% url 'contact' %}">Contact</a></li>
-                    <li><a href="{% url 'cos_virtual' %}">Cosul Meu</a></li>
-                </ul>
-                
-                <a href="{% url 'produse' %}" class="btn-explore">Exploreaza Produsele</a>
-            </nav>
-        </div>
-    </header> {% endcomment %}
-
     <header class="new-header">
         <div class="header-content">
             <a href="{% url 'index' %}" class="logo-area">
                 <img src="{% static 'imagini/logo.png' %}" alt="Tankeria Logo" class="logo-img">
                 <span class="logo-text">TANKERIA</span>
             </a>
-            
             <nav class="header-nav">
                 <ul class="meniu-derulant">
                     <li><a href="{% url 'index' %}">Acasa</a>
                         <ul class="submeniu">
-                            <li><a href="#cele-mai-populare">Cele mai populare</a></li>
-                            <li><a href="#noutati">Noutati</a></li>
-                            <li><a href="#oferta-speciala">Oferta speciala</a></li>
+                            <li><a href="{% url 'index' %}#featured-series">Serii Populare</a></li>
+                            <li><a href="{% url 'index' %}#why-choose-section">De ce noi?</a></li>
+                            <li><a href="{% url 'index' %}#cta-section">Incepe Acum</a></li>
                         </ul>
                     </li>
-                    
-                    <li><a href="{% url 'produse' %}">Categorii</a>
-                        <ul class="submeniu">
-                            {% for cat in categorii_meniu %}
-                            <li>
-                                <a href="{% url 'categorie_detaliu' cat.nume_categorie %}"
-                                    class="link-categorie"
-                                    style="--culoare-baza: {{ cat.culoare }}; --culoare-activa: {{ cat.culoare_activa }};">
-                                    {{ cat.nume_categorie }}
-                                </a>
-                            </li>
-                            {% empty %}
-                            <li><a href="#">Nicio categorie</a></li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    
+
+                    <li><a href="{% url 'serie_list' %}">Serii</a></li>
+                        
                     <li><a href="{% url 'despre' %}">Despre</a>
                         <ul class="submeniu">
-                            <li><a href="#istoric">Istoric</a></li>
-                            <li><a href="#colectie">Colectia noastra</a></li>
+                            <li><a href="{% url 'despre' %}#misiunea-noastra">Misiunea Noastra</a></li>
+                            <li><a href="{% url 'despre' %}#calitate-si-precizie">Calitate si Precizie</a></li>
+                            <li><a href="{% url 'despre' %}#comunitatea-noastra">Comunitatea Noastra</a></li>
                         </ul>
                     </li>
                     <li><a href="{% url 'contact' %}">Contact</a></li>
@@ -148,10 +48,70 @@
         {% endblock %}
     </main>
 
-    <footer>
-        <div class="footer-content">
-            <p>IP-ul tau: {{ ip_address }}</p>
-            <p>&copy; 2025 Figurine Tancuri Militare. Toate drepturile rezervate.</p>
+    <footer class="new-footer">
+        <div class="footer-container">
+            
+            <div class="footer-top">
+                <div class="footer-column about">
+                    <a href="{% url 'index' %}" class="footer-logo-area">
+                        <img src="{% static 'imagini/logo.png' %}" alt="Tankeria Logo" class="logo-img">
+                        <span class="logo-text">TANKERIA</span>
+                    </a>
+                    <p>Figurine de tancuri militare premium pentru colecționarii care apreciază precizia istorică.</p>
+                    <div class="footer-social-icons">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column links">
+                    <h4>Accesare Rapidă</h4>
+                    <ul class="footer-links-list">
+                        <li><a href="{% url 'index' %}">Acasa</a></li>
+                        <li><a href="{% url 'serie_list' %}">Serii</a></li>
+                        <li><a href="{% url 'despre' %}">Despre Noi</a></li>
+                        <li><a href="{% url 'produse' %}">Produse</a></li>
+                        <li><a href="{% url 'contact' %}">Contacteaza-ne</a></li>
+                        <li><a href="{% url 'cos_virtual' %}">Cosul Meu</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column links">
+                    <h4>Serviciul Clientului</h4>
+                    <ul class="footer-links-list">
+                        <li><a href="{% url 'shipping_returns' %}">Livrare și Retururi</a></li>
+                        <li><a href="{% url 'privacy_policy' %}">Politica de Confidențialitate</a></li>
+                        <li><a href="{% url 'terms_conditions' %}">Termeni și Condiții</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column subscribe">
+                    <h4>Rămâi la Curent</h4>
+                    <p>Abonează-te pentru a primi oferte speciale și lansări de modele noi.</p>
+                    <form class="footer-subscribe-form">
+                        <input type="email" placeholder="Adresa ta de email" required>
+                        <button type="submit" aria-label="Subscribe">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    <p>IP-ul tau: {{ ip_address }}</p>
+                    <p>&copy; 2025 Figurine Tancuri Militare. Toate drepturile rezervate.</p>
+                </div>
+                <div class="footer-payment-icons">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-amex"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                </div>
+            </div>
+            
         </div>
     </footer>
 </body>

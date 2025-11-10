@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from .models import Categorie, Producator, Figurina
+from .models import Categorie, Producator, Figurina, Seria
 from django.db.models import Count
 from django.http import HttpResponse
 from django.utils import timezone
@@ -150,7 +150,15 @@ def get_ip_address(request):
     return ip
 
 def index(request):
-    context = {'ip_address': get_ip_address(request)}
+    featured_series = Seria.objects.filter(
+        disponibilitate=True,
+        imagine_serie__isnull=False
+    ).order_by('?')[:3]
+
+    context = {
+        'ip_address': get_ip_address(request),
+        'featured_series': featured_series
+    }
     return render(request, 'index.html', context)
 
 def despre(request):
@@ -225,3 +233,26 @@ def categorie_detaliu(request, nume_categorie):
         'ip_address': get_ip_address(request)
     }
     return render(request, 'categorie_detaliu.html', context)
+
+def serie_list(request):
+    serii_list = Seria.objects.filter(disponibilitate=True).order_by('nume_serie')
+    
+    paginator = Paginator(serii_list, 4) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'ip_address': get_ip_address(request)
+    }
+    return render(request, 'serie_list.html', context)
+
+def serie_detaliu(request, id_serie):
+    serie = get_object_or_404(Seria, id_serie=id_serie)
+    produse_in_serie = Figurina.objects.filter(id_serie=serie)
+    context = {
+        'serie': serie,
+        'produse': produse_in_serie,
+        'ip_address': get_ip_address(request)
+    }
+    return render(request, 'serie_detaliu.html', context)

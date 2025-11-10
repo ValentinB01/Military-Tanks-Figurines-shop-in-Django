@@ -1,0 +1,62 @@
+{% extends 'baza.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="serii-title-section">
+    <h1>Rasfoieste Seriile Noastre</h1>
+</section>
+
+<section id="serie-lista">
+    
+    <div class="serie-grid">
+        
+        {% for serie in page_obj %}
+            <article class="serie-card">
+                <a href="{% url 'serie_detaliu' serie.id_serie %}" class="serie-card-image-link">
+                    <div class="serie-card-image-wrapper">
+                        {% if serie.imagine_serie %}
+                            <img src="{{ serie.imagine_serie.url }}" alt="{{ serie.nume_serie }}">
+                        {% else %}
+                            <img src="{% static 'imagini/placeholder.png' %}" alt="Imagine indisponibilă">
+                        {% endif %}
+                    </div>
+                </a>
+                
+                <div class="serie-card-content">
+                    <h3>
+                        <a href="{% url 'serie_detaliu' serie.id_serie %}">
+                            {{ serie.nume_serie }} ({{ serie.scala }})
+                        </a>
+                    </h3>
+                    
+                    <a href="{% url 'serie_detaliu' serie.id_serie %}" class="btn-serie-detalii">
+                        Vedeti Detalii
+                    </a>
+                </div>
+            </article>
+        {% empty %}
+            <p>Nu există serii disponibile momentan.</p>
+        {% endfor %}
+    </div>
+
+    <div class="paginare">
+        <span class="pas-paginare">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; prima</a>
+                <a href="?page={{ page_obj.previous_page_number }}">precedenta</a>
+            {% endif %}
+
+            <span class="pagina-curenta">
+                Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">următoarea</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">ultima &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+    
+</section>
+{% endblock %}

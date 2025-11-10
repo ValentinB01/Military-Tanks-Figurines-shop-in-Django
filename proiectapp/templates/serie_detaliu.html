@@ -1,0 +1,85 @@
+{% extends 'baza.html' %}
+{% load static %}
+
+{% block content %}
+{% comment %} <section id="serie-detaliu">
+    <h2>Serie: {{ serie.nume_serie }} ({{ serie.scala }})</h2>
+    <p>An lansare: {{ serie.an_lansare }}</p>
+    <p>{{ serie.descriere|default:"Fără descriere." }}</p>
+    
+    <hr style="margin: 2rem 0;">
+    
+    <h3>Produse din aceasta serie:</h3>
+    
+    <div class="lista-produse">
+        {% for p in produse %}
+            <article class="produs-card" style="text-align: center;">
+                <h3><a href="{% url 'produs_detaliu' p.id_figurina %}">{{ p.nume_figurina }}</a></h3>
+                
+                {% if p.imagine %}
+                    <a href="{% url 'produs_detaliu' p.id_figurina %}">
+                        <img src="{{ p.imagine.url }}" alt="{{ p.nume_figurina }}" style="max-width: 150px; height: auto; border-radius: 5px;">
+                    </a>
+                {% endif %}
+                
+                <p>Preț: {{ p.pret }} RON</p>
+            </article>
+        {% empty %}
+            <p>Nu exista produse în aceasta serie.</p>
+        {% endfor %}
+    </div>
+    
+</section> {% endcomment %}
+<section class="page-title-section">
+    <h1>Serie: {{ serie.nume_serie }} ({{ serie.scala }})</h1>
+    <p style="color: #6c757d; font-size: 1.1rem;">
+        An lansare: {{ serie.an_lansare }} | Producător: {{ serie.id_producator.nume_producator }}
+    </p>
+    {% if serie.descriere %}
+        <p>{{ serie.descriere }}</p>
+    {% endif %}
+</section>
+
+<section id="serie-detaliu" class="serie-detaliu-produse">
+    <h3 class="produse-din-serie-titlu">Produse din această serie:</h3>
+    
+    <div class="lista-produse">
+        {% for p in produse %}
+        <article class="produs-card">
+            <a href="{% url 'produs_detaliu' p.id_figurina %}" class="card-image-link">
+                {% if p.imagine %}
+                    <img src="{{ p.imagine.url }}" alt="{{ p.nume_figurina }}">
+                {% else %}
+                    <img src="{% static 'imagini/placeholder.png' %}" alt="Imagine indisponibilă">
+                {% endif %}
+            </a>
+            
+            <div class="card-continut">
+                <p class="card-categorie">
+                    <a href="{% url 'categorie_detaliu' p.id_categorie.nume_categorie %}"
+                       class="link-categorie" 
+                       style="--culoare-baza: {{ p.id_categorie.culoare }}; --culoare-activa: {{ p.id_categorie.culoare_activa }};">
+                        {{ p.id_categorie.nume_categorie }}
+                    </a>
+                </p>
+                
+                <h3 class="card-titlu">
+                    <a href="{% url 'produs_detaliu' p.id_figurina %}">{{ p.nume_figurina }}</a>
+                </h3>
+                
+                <p class="card-stare">{{ p.get_stare_display }}</p>
+                
+                <div class="card-spacer"></div> 
+                
+                <p class="card-pret">{{ p.pret }} RON</p>
+            </div>
+        </article>
+        {% empty %}
+            <p style="text-align: center; grid-column: 1 / -1; font-size: 1.1rem; color: #6c757d;">
+                Nu există (încă) produse listate în această serie.
+            </p>
+        {% endfor %}
+    </div>
+    
+</section>
+{% endblock %}

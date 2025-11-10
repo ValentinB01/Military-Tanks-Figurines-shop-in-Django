@@ -2,16 +2,48 @@
 {% load static %}
 
 {% block content %}
-<section id="istoric">
-    <h2>Istoricul nostru</h2>
-    <img src="{% static 'imagini/logo.png' %}" alt="Logo Figurine Tancuri" width="200">
-    <p>De peste 10 ani, ne dedicam pasiunii pentru figurinele de tancuri militare. Incepand de la o simpla idee, am crescut și devenit unul dintre principalii furnizori de figurine de tancuri din tara.</p>
-    <p>Fiecare model din colectia noastra este verificat din punct de vedere istoric si este creat cu cea mai mare atentie la detalii.</p>
+<section class="page-title-section">
+    <h1>Despre Noi</h1>
+    <p>Pasiunea noastră pentru istorie și detaliu, la scara potrivită.</p>
 </section>
 
-<section id="colectie">
-    <h2>Colectia noastra</h2>
-    <p>Avem peste 200 de modele diferite de tancuri, de la cele din Primul Război Mondial până la cele moderne. Colaboram cu producatori internationali renumiti precum Tamiya, Revell și Dragon Models.</p>
-    <p>Toate figurinele noastre sunt livrate cu certificate de autenticitate si ghid de asamblare detaliat.</p>
+<section id="misiunea-noastra" class="about-section">
+    <div class="about-section-content">
+        <div class="about-text">
+            <h2>Misiunea Noastră</h2>
+            <p>La Tankeria, misiunea noastră este de a aduce istoria militară la viață. Credem că fiecare model de tanc nu este doar o jucărie, ci o piesă de istorie tangibilă. Ne dedicăm oferirii celor mai autentice și detaliate figurine pentru colecționari serioși și pasionați deopotrivă.</p>
+            <p>Colaborăm cu producători de top precum Tamiya, Revell și Dragon Models pentru a asigura o calitate excepțională.</p>
+        </div>
+        <div class="about-image">
+            <img src="{% static 'imagini/checklist.jpg' %}" alt="Model Tanc Tiger I">
+        </div>
+    </div>
 </section>
+
+<section id="calitate-si-precizie" class="about-section">
+    <div class="about-section-content">
+        <div class="about-text">
+            <h2>Calitate și Precizie</h2>
+            <p>Fiecare model din colecția noastră este selectat manual pentru acuratețea sa istorică și calitatea fabricației. De la scările populare (1:35, 1:72) la materialele folosite (plastic polistiren, metal turnat), ne asigurăm că fiecare detaliu este corect.</p>
+            <p>Fie că sunteți un constructor veteran sau abia la început, veți găsi piese de o calitate muzeală care vor adăuga valoare colecției dumneavoastră.</p>
+        </div>
+        <div class="about-image">
+            <img src="{% static 'imagini/calitate.png' %}" alt="">
+        </div>
+    </div>
+</section>
+
+<section id="comunitatea-noastra" class="about-section">
+    <div class="about-section-content">
+        <div class="about-text">
+            <h2>Comunitatea Noastră</h2>
+            <p>Tankeria este mai mult decât un magazin; este o comunitate de entuziaști. Organizăm evenimente, concursuri de modelism și oferim resurse pentru a vă ajuta să vă perfecționați tehnicile de asamblare și vopsire.</p>
+            <p>Vă invităm să vă alăturați forumului nostru și să împărtășiți progresul dumneavoastră cu alți colecționari.</p>
+        </div>
+        <div class="about-image">
+            <img src="{% static 'imagini/comunity.png' %}" alt="">
+        </div>
+    </div>
+</section>
+
 {% endblock %}

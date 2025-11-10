@@ -85,6 +85,12 @@ class Seria(models.Model):
         default='1:35'
     )
     id_producator = models.ForeignKey(Producator, on_delete=models.CASCADE)
+    imagine_serie = models.ImageField(
+        upload_to='serii_imagini/',
+        null=True,
+        blank=True,
+        verbose_name="Imagine Serie"
+    )
     class Meta:
         verbose_name = "Serie"
         verbose_name_plural = "Serii"

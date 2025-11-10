@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'proiectapp.context_processors.ip_address',
                 'proiectapp.context_processors.categorii_meniu',
+                'proiectapp.context_processors.serii_meniu',
             ],
         },
     },

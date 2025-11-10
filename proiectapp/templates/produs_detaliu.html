@@ -23,7 +23,11 @@
                 {{ fig.id_categorie.nume_categorie }}
         </a>
     </p>
-    <p><strong>Serie:</strong> {{ fig.id_serie.nume_serie }} ({{ fig.id_serie.scala }})</p>
+    <p><strong>Serie:</strong> 
+            <a href="{% url 'serie_detaliu' fig.id_serie.id_serie %}">
+                {{ fig.id_serie.nume_serie }} ({{ fig.id_serie.scala }})
+            </a>
+    </p>
     <p><strong>Tara de origine:</strong> {{ fig.get_tara_origine_display }}</p>
     <p><strong>Greutate:</strong> {{ fig.greutate }} kg</p>
     <p><strong>Data lansarii:</strong> {{ fig.data_lansare }}</p>

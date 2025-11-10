@@ -4,42 +4,63 @@
 {% block content %}
 <section id="produse-lista">
     <h2>Produsele Noastre</h2>
-
-    <div>
-        Sorteaza dupa pret:
-        <a href="?sort=a{% if params_sorting %}&{{ params_sorting }}{% endif %}">Crescator</a> | 
-        <a href="?sort=d{% if params_sorting %}&{{ params_sorting }}{% endif %}">Descrescator</a> |
-        <a href="?{% if params_sorting %}&{{ params_sorting }}{% endif %}">Implicit (Nume)</a>
+    
+    <form method="GET" action="{% url 'produse' %}" class="filter-form">
+        {{ form.as_p }}
+        <a href="{% url 'produse' %}" class="btn-reset">Resetează Filtrele</a>
+    </form>
+    
+    <hr class="section-divider">
+    
+    <div class="sortare-container">
+        <span>Sortează după preț:</span>
+        <a href="?sort=a{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
+           class="sort-link {% if request.GET.sort == 'a' %}active{% endif %}">
+           Crescător
+        </a>
+        <a href="?sort=d{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
+           class="sort-link {% if request.GET.sort == 'd' %}active{% endif %}">
+           Descrescător
+        </a>
+        <a href="?{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
+           class="sort-link {% if not request.GET.sort and not request.GET.sort == 'd' %}active{% endif %}">
+           Implicit
+        </a>
     </div>
-
+    
     <div class="lista-produse">
         {% for fig in page_obj %}
-            <article class="produs-card" style="text-align: center;">
-                <h3><a href="{% url 'produs_detaliu' fig.id_figurina %}">{{ fig.nume_figurina }}</a></h3>
-                
+        <article class="produs-card">
+            <a href="{% url 'produs_detaliu' fig.id_figurina %}" class="card-image-link">
                 {% if fig.imagine %}
-                    <a href="{% url 'produs_detaliu' fig.id_figurina %}">
-                        <img src="{{ fig.imagine.url }}" alt="{{ fig.nume_figurina }}" 
-                            style="max-width: 250px; height: auto; border-radius: 5px; display: block; margin: 10px auto;">
-                    </a>
+                    <img src="{{ fig.imagine.url }}" alt="{{ fig.nume_figurina }}">
                 {% else %}
-                    <a href="{% url 'produs_detaliu' fig.id_figurina %}">
-                        <img src="{% static 'imagini/placeholder.png' %}" alt="Imagine indisponibila" 
-                            style="max-width: 250px; height: auto; border-radius: 5px; display: block; margin: 10px auto;">
-                    </a>
+                    <img src="{% static 'imagini/placeholder.png' %}" alt="Imagine indisponibilă">
                 {% endif %}
-                <p>Pret: {{ fig.pret }} RON</p>
-                <p>Stare: {{ fig.get_stare_display }}</p>
-                <p>Categorie: 
+            </a>
+            
+            <div class="card-continut">
+                <p class="card-categorie">
                     <a href="{% url 'categorie_detaliu' fig.id_categorie.nume_categorie %}"
-                        class="link-categorie" 
-                        style="--culoare-baza: {{ fig.id_categorie.culoare }}; --culoare-activa: {{ fig.id_categorie.culoare_activa }};">
+                       class="link-categorie" 
+                       style="--culoare-baza: {{ fig.id_categorie.culoare }}; --culoare-activa: {{ fig.id_categorie.culoare_activa }};">
                         {{ fig.id_categorie.nume_categorie }}
                     </a>
                 </p>
-            </article>
-            {% empty %}
-        <p>Nu exista produse de afisat.</p>
+                
+                <h3 class="card-titlu">
+                    <a href="{% url 'produs_detaliu' fig.id_figurina %}">{{ fig.nume_figurina }}</a>
+                </h3>
+                
+                <p class="card-stare">{{ fig.get_stare_display }}</p>
+                
+                <div class="card-spacer"></div> 
+                
+                <p class="card-pret">{{ fig.pret }} RON</p>
+            </div>
+        </article>
+        {% empty %}
+        <p>Nu au fost găsite produse care să corespundă filtrelor selectate.</p>
         {% endfor %}
     </div>
 
@@ -55,7 +76,7 @@
             </span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">urmatoarea</a>
+                <a href="?page={{ page_obj.next_page_number }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">următoarea</a>
                 <a href="?page={{ page_obj.paginator.num_pages }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">ultima &raquo;</a>
             {% endif %}
         </span>

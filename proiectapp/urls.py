@@ -12,5 +12,9 @@ urlpatterns = [
     path('info/', views.info_view, name='info'),
     path('produse/<int:id_figurina>/', views.produs_detaliu, name='produs_detaliu'),
     path('categorii/<str:nume_categorie>/', views.categorie_detaliu, name='categorie_detaliu'),
-    
+    path('serii/', views.serie_list, name='serie_list'),
+    path('serii/<int:id_serie>/', views.serie_detaliu, name='serie_detaliu'),
+    path('shipping-returns/', views.in_lucru, name='shipping_returns'),
+    path('privacy-policy/', views.in_lucru, name='privacy_policy'),
+    path('terms-conditions/', views.in_lucru, name='terms_conditions'),
 ]
