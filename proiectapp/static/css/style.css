@@ -512,7 +512,7 @@ hr.section-divider {
 .card-image-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .card-content {
@@ -1073,6 +1073,7 @@ hr.section-divider {
     max-width: 800px;
     margin: 0 auto 1.5rem auto;
     overflow: hidden;
+    height: 220px;
 }
 
 .produs-card:hover {
@@ -1082,7 +1083,7 @@ hr.section-divider {
 
 .card-image-link {
     display: block;
-    height: 220px;
+    /* height: 220px; */
     flex-basis: 300px;
     flex-shrink: 0;
 }
@@ -1090,7 +1091,7 @@ hr.section-divider {
 .card-image-link img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 0;
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
@@ -1118,6 +1119,11 @@ hr.section-divider {
 .card-titlu a {
     color: #2c3e50;
     text-decoration: none;
+
+    display: block;
+    white-space: nowrap; /* Împiedică textul să treacă pe rândul următor */
+    overflow: hidden; /* Ascunde textul care depășește */
+    text-overflow: ellipsis;
 }
 
 .card-stare {
@@ -1178,7 +1184,7 @@ hr.section-divider {
 .serie-card-image-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .serie-card-content {
@@ -1313,7 +1319,6 @@ hr.section-divider {
     .card-content p {
         height: auto;
     }
-
     .trust-badges {
         flex-direction: column;
         align-items: center;
@@ -1323,7 +1328,6 @@ hr.section-divider {
         width: 100%;
         max-width: 250px;
     }
-    
     .footer-top {
         grid-template-columns: 1fr;
     }
@@ -1332,26 +1336,30 @@ hr.section-divider {
         gap: 1.5rem;
         text-align: center;
     }
-    
     .about-section-content {
         flex-direction: column;
     }
     .about-section:nth-of-type(even) .about-section-content {
         flex-direction: column;
     }
-    
     .produs-card {
         flex-direction: column;
         max-width: 500px;
+        height: auto;
     }
     .card-image-link {
         flex-basis: auto;
-        height: 250px;
+        height: auto;
     }
     .card-image-link img {
         border-radius: 0;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
+    }
+    .card-titlu a {
+        white-space: normal;
+        overflow: visible;   
+        text-overflow: clip; 
     }
 }
 
