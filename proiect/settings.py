@@ -140,4 +140,14 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend'
 ]
 
-# AUTH_USER_MODEL = 'proiectapp.CustomUser'
+AUTH_USER_MODEL = 'proiectapp.CustomUser'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.example.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'test.tweb.node@gmail.com'
+EMAIL_HOST_PASSWORD = 'xdqswyrleddghrgm'
+DEFAULT_FORM_EMAIL = 'Da-Boss <test.tweb.node@gmail.com>'
+

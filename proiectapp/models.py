@@ -2,7 +2,57 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import date
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 
+
+class CustomUser(AbstractUser):
+    phone_validator = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message="Numarul de telefon trebuie sa fie in formatul: '+999999999'. Pana la 15 cifre permise."
+    )
+    
+    telefon = models.CharField(
+        validators=[phone_validator], 
+        max_length=17, 
+        blank=True, 
+        null=True,
+        help_text="Numarul de telefon (optional)."
+    )
+    
+    data_nasterii = models.DateField(
+        blank=True, 
+        null=True,
+        help_text="Data nasterii (optional)."
+    )
+    
+    adresa_strada = models.CharField(
+        max_length=255, 
+        blank=True, 
+        null=True
+    )
+    
+    adresa_oras = models.CharField(
+        max_length=100, 
+        blank=True, 
+        null=True
+    )
+    
+    adresa_judet = models.CharField(
+        max_length=100, 
+        blank=True, 
+        null=True
+    )
+    
+    adresa_cod_postal = models.CharField(
+        max_length=10, 
+        blank=True, 
+        null=True,
+        help_text="Codul postal (optional)."
+    )
+    
+    def __str__(self):
+        return self.username
 
 class AccessLog(models.Model):
     ip_address = models.GenericIPAddressField()
@@ -10,7 +60,12 @@ class AccessLog(models.Model):
     path = models.CharField(max_length=500)
     method = models.CharField(max_length=10, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(
+        'CustomUser',
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True
+    )
     class Meta:
         verbose_name = "Log Acces"
         verbose_name_plural = "Loguri Acces"

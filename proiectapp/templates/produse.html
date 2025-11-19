@@ -5,26 +5,128 @@
 <section id="produse-lista">
     <h2>Produsele Noastre</h2>
     
-    <form method="GET" action="{% url 'produse' %}" class="filter-form">
-        {{ form.as_p }}
-        <a href="{% url 'produse' %}" class="btn-reset">Resetează Filtrele</a>
+    <form method="GET" action="{% url 'produse' %}" class="filter-form" id="filter-form">
+        
+        {% if form.non_field_errors %}
+            {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.nume_figurina.id_for_label }}">{{ form.nume_figurina.label }}</label>
+            {{ form.nume_figurina }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.ordonare.id_for_label }}">{{ form.ordonare.label }}</label>
+            {{ form.ordonare }}
+            {{ form.ordonare.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.per_pagina.id_for_label }}">{{ form.per_pagina.label }}</label>
+            {{ form.per_pagina }}
+            {{ form.per_pagina.errors }}
+        </div>
+
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.pret_min.id_for_label }}">{{ form.pret_min.label }}</label>
+                {{ form.pret_min }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.pret_max.id_for_label }}">{{ form.pret_max.label }}</label>
+                {{ form.pret_max }}
+            </div>
+        </div>
+        
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.greutate_min.id_for_label }}">{{ form.greutate_min.label }}</label>
+                {{ form.greutate_min }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.greutate_max.id_for_label }}">{{ form.greutate_max.label }}</label>
+                {{ form.greutate_max }}
+            </div>
+        </div>
+
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.data_lansare_min.id_for_label }}">{{ form.data_lansare_min.label }}</label>
+                {{ form.data_lansare_min }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.data_lansare_max.id_for_label }}">{{ form.data_lansare_max.label }}</label>
+                {{ form.data_lansare_max }}
+            </div>
+        </div>
+
+        <div class="form-group-checkbox">
+            <strong>{{ form.stare.label }}</strong>
+            <div class="checkbox-container">
+                {{ form.stare }}
+            </div>
+        </div>
+        
+        <div class="form-group-checkbox">
+            <strong>{{ form.tara_origine.label }}</strong>
+            <div class="checkbox-container">
+                {{ form.tara_origine }}
+            </div>
+        </div>
+
+        <div class="form-group-checkbox">
+            <strong>{{ form.id_categorie.label }}</strong>
+            <div class="checkbox-container">
+                {{ form.id_categorie }}
+            </div>
+        </div>
+        
+        <div class="form-group-checkbox">
+            <strong>{{ form.id_producator.label }}</strong>
+            <div class="checkbox-container">
+                {{ form.id_producator }}
+            </div>
+        </div>
+
+        <div class="form-group-checkbox">
+            <strong>{{ form.id_serie.label }}</strong>
+            <div class="checkbox-container">
+                {{ form.id_serie }}
+            </div>
+        </div>
+        
+        <div class="form-group-checkbox">
+            <strong>{{ form.materiale.label }}</strong>
+            <div class="checkbox-container">
+                {{ form.materiale }}
+            </div>
+        </div>
+
+        <div class="form-buttons">
+            <button type="submit" class="btn-filter">Aplică Filtrele</button>
+            <a href="{% url 'produse' %}" class="btn-reset" onclick="return confirm('Sunteți sigur că doriți să resetați filtrele? Toate selecțiile curente vor fi pierdute.');">Resetează Filtrele</a>
     </form>
-    
     <hr class="section-divider">
+    
+    {% if repaginare_warning %}
+        <div class="repaginare-warning">
+            <strong>Notă:</strong> Ați schimbat numărul de produse pe pagină. Este posibil să fi sărit peste unele produse sau să le revedeți pe cele deja vizualizate.
+        </div>
+    {% endif %}
     
     <div class="sortare-container">
         <span>Sortează după preț:</span>
         <a href="?sort=a{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
-           class="sort-link {% if request.GET.sort == 'a' %}active{% endif %}">
-           Crescător
+            class="sort-link {% if request.GET.sort == 'a' %}active{% endif %}">
+            Crescător
         </a>
         <a href="?sort=d{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
-           class="sort-link {% if request.GET.sort == 'd' %}active{% endif %}">
-           Descrescător
+            class="sort-link {% if request.GET.sort == 'd' %}active{% endif %}">
+            Descrescător
         </a>
         <a href="?{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
-           class="sort-link {% if not request.GET.sort and not request.GET.sort == 'd' %}active{% endif %}">
-           Implicit
+            class="sort-link {% if not request.GET.sort and not request.GET.sort == 'd' %}active{% endif %}">
+            Implicit
         </a>
     </div>
     
@@ -42,8 +144,8 @@
             <div class="card-continut">
                 <p class="card-categorie">
                     <a href="{% url 'categorie_detaliu' fig.id_categorie.nume_categorie %}"
-                       class="link-categorie" 
-                       style="--culoare-baza: {{ fig.id_categorie.culoare }}; --culoare-activa: {{ fig.id_categorie.culoare_activa }};">
+                        class="link-categorie" 
+                        style="--culoare-baza: {{ fig.id_categorie.culoare }}; --culoare-activa: {{ fig.id_categorie.culoare_activa }};">
                         {{ fig.id_categorie.nume_categorie }}
                     </a>
                 </p>

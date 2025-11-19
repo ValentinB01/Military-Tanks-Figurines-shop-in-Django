@@ -1,0 +1,167 @@
+{% extends 'baza.html' %}
+{% load static %}
+
+{% block content %}
+<section class="page-title-section">
+    <h1>Adăugare Produs Nou</h1>
+    <p>Completați detaliile pentru noua figurină.</p>
+</section>
+
+<section id="add-product-form" style="background: #fff; max-width: 900px; margin: 2rem auto; padding: 2rem; border-radius: 8px;">
+
+    <form method="POST" enctype="multipart/form-data" class="contact-form" novalidate>
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="form-errors" style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 1rem; border-radius: 5px; margin-bottom: 1.5rem;">
+                {% for error in form.non_field_errors %}
+                    <p class="error-message" style="margin: 0;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.nume_figurina.id_for_label }}">{{ form.nume_figurina.label }}*</label>
+                {{ form.nume_figurina }}
+                {% if form.nume_figurina.errors %}<div class="field-error">{{ form.nume_figurina.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.imagine.id_for_label }}">{{ form.imagine.label }}</label>
+                {{ form.imagine }}
+                {% if form.imagine.errors %}<div class="field-error">{{ form.imagine.errors|striptags }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="{{ form.descriere.id_for_label }}">{{ form.descriere.label }}</label>
+            {{ form.descriere }}
+            {% if form.descriere.errors %}<div class="field-error">{{ form.descriere.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <hr style="margin: 1rem 0;">
+        <h4 style="margin-bottom: 1rem;">Calcul Preț (Câmpuri Adiționale)</h4>
+
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.pret_achizitie.id_for_label }}">{{ form.pret_achizitie.label }}*</label>
+                {{ form.pret_achizitie }}
+                {% if form.pret_achizitie.help_text %}<small class="help-text">{{ form.pret_achizitie.help_text }}</small>{% endif %}
+                {% if form.pret_achizitie.errors %}<div class="field-error">{{ form.pret_achizitie.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.procentaj_adaos.id_for_label }}">{{ form.procentaj_adaos.label }}*</label>
+                {{ form.procentaj_adaos }}
+                {% if form.procentaj_adaos.help_text %}<small class="help-text">{{ form.procentaj_adaos.help_text }}</small>{% endif %}
+                {% if form.procentaj_adaos.errors %}<div class="field-error">{{ form.procentaj_adaos.errors|striptags }}</div>{% endif %}
+            </div>
+        </div>
+        
+        <hr style="margin: 1rem 0;">
+        <h4 style="margin-bottom: 1rem;">Detalii Logistice</h4>
+        
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.greutate.id_for_label }}">{{ form.greutate.label }}*</label>
+                {{ form.greutate }}
+                {% if form.greutate.help_text %}<small class="help-text">{{ form.greutate.help_text }}</small>{% endif %}
+                {% if form.greutate.errors %}<div class="field-error">{{ form.greutate.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.stoc_disponibil.id_for_label }}">{{ form.stoc_disponibil.label }}*</label>
+                {{ form.stoc_disponibil }}
+                {% if form.stoc_disponibil.errors %}<div class="field-error">{{ form.stoc_disponibil.errors|striptags }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.data_lansare.id_for_label }}">{{ form.data_lansare.label }}*</label>
+                {{ form.data_lansare }}
+                {% if form.data_lansare.errors %}<div class="field-error">{{ form.data_lansare.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.stare.id_for_label }}">{{ form.stare.label }}*</label>
+                {{ form.stare }}
+                {% if form.stare.errors %}<div class="field-error">{{ form.stare.errors|striptags }}</div>{% endif %}
+            </div>
+        </div>
+
+        <hr style="margin: 1rem 0;">
+        <h4 style="margin-bottom: 1rem;">Categorizare</h4>
+
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.id_categorie.id_for_label }}">{{ form.id_categorie.label }}*</label>
+                {{ form.id_categorie }}
+                {% if form.id_categorie.errors %}<div class="field-error">{{ form.id_categorie.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.id_producator.id_for_label }}">{{ form.id_producator.label }}*</label>
+                {{ form.id_producator }}
+                {% if form.id_producator.errors %}<div class="field-error">{{ form.id_producator.errors|striptags }}</div>{% endif %}
+            </div>
+        </div>
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.id_serie.id_for_label }}">{{ form.id_serie.label }}*</label>
+                {{ form.id_serie }}
+                {% if form.id_serie.errors %}<div class="field-error">{{ form.id_serie.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.tara_origine.id_for_label }}">{{ form.tara_origine.label }}*</label>
+                {{ form.tara_origine }}
+                {% if form.tara_origine.errors %}<div class="field-error">{{ form.tara_origine.errors|striptags }}</div>{% endif %}
+            </div>
+        </div>
+
+        <hr style="margin: 1rem 0;">
+        <h4 style="margin-bottom: 1rem;">Componente (Opțional)</h4>
+
+        <div class="form-group-checkbox">
+            <strong>{{ form.materiale.label }}</strong>
+            <div class="checkbox-container">{{ form.materiale }}</div>
+            {% if form.materiale.errors %}<div class="field-error">{{ form.materiale.errors|striptags }}</div>{% endif %}
+        </div>
+        
+        <div class="form-group-checkbox" style="margin-top: 1rem;">
+            <strong>{{ form.seturi_accesorii.label }}</strong>
+            <div class="checkbox-container">{{ form.seturi_accesorii }}</div>
+            {% if form.seturi_accesorii.errors %}<div class="field-error">{{ form.seturi_accesorii.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <br>
+        <button type="submit" class="btn-submit-contact" style="background-color: #4a6d81; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background-color 0.3s ease;">
+            Salvează Produsul
+        </button>
+    </form>
+    
+    <style>
+        .contact-form .form-group input,
+        .contact-form .form-group select,
+        .contact-form .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .contact-form .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .field-error {
+            color: #721c24; 
+            font-size: 0.9rem; 
+            margin-top: 0.25rem;
+        }
+        .help-text {
+            font-size: 0.85rem; 
+            color: #6c757d; 
+            margin-top: 0.25rem;
+        }
+    </style>
+</section>
+{% endblock %}

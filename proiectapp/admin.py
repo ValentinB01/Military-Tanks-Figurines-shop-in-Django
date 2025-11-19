@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import *
+from django.contrib.auth.admin import UserAdmin
 
 @admin.register(Categorie)
 class CategorieAdmin(admin.ModelAdmin):
@@ -108,4 +109,13 @@ class FigurinaAdmin(admin.ModelAdmin):
             'fields': ('descriere',),
             'classes': ('collapse',)  
         }),
+    )
+    
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+        add_fieldsets = UserAdmin.add_fieldsets + (
+        ('Date Suplimentare', {'fields': ('telefon', 'data_nasterii', 'adresa_oras')}),
+    )
+        fieldsets = UserAdmin.fieldsets + (
+        ('Date Suplimentare', {'fields': ('telefon', 'data_nasterii', 'adresa_strada', 'adresa_oras', 'adresa_judet', 'adresa_cod_postal')}),
     )

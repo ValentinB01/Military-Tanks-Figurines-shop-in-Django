@@ -1,0 +1,25 @@
+{% extends 'baza.html' %}
+
+{% block content %}
+<section class="page-title-section">
+    <h1>Salut, {{ profil.username|default:user.username }}!</h1>
+    <p>Acesta este panoul tau de control.</p>
+</section>
+
+<section style="max-width: 800px; margin: 2rem auto; padding: 2rem; background: #fff;">
+    <h3>Datele tale de profil (din Sesiune)</h3>
+    
+    <p><strong>Nume Utilizator:</strong> {{ profil.username }}</p>
+    <p><strong>Email:</strong> {{ profil.email }}</p>
+    <p><strong>Nume:</strong> {{ profil.nume|default:"Nespecificat" }}</p>
+    <p><strong>Prenume:</strong> {{ profil.prenume|default:"Nespecificat" }}</p>
+    <p><strong>Telefon:</strong> {{ profil.telefon|default:"Nespecificat" }}</p>
+    <p><strong>Data Nasterii:</strong> {{ profil.data_nasterii|default:"Nespecificat" }}</p>
+    <p><strong>Oras:</strong> {{ profil.oras|default:"Nespecificat" }}</p>
+    
+    <hr style="margin: 2rem 0;">
+    
+    <a href="{% url 'change_password' %}" class="btn-reset">Schimba Parola</a>
+    <a href="{% url 'logout' %}" class="btn-filter" style="background-color: #c0392b;">Logout</a>
+</section>
+{% endblock %}

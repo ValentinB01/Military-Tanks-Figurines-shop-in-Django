@@ -17,4 +17,11 @@ urlpatterns = [
     path('shipping-returns/', views.in_lucru, name='shipping_returns'),
     path('privacy-policy/', views.in_lucru, name='privacy_policy'),
     path('terms-conditions/', views.in_lucru, name='terms_conditions'),
+
+    path('produse/adauga/', views.adauga_produs, name='adauga_produs'),
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('profil/', views.profile_view, name='profile'),
+    path('schimba-parola/', views.change_password_view, name='change_password'),
 ]

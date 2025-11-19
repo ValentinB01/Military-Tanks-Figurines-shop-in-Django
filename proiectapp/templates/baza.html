@@ -36,6 +36,13 @@
                     </li>
                     <li><a href="{% url 'contact' %}">Contact</a></li>
                     <li><a href="{% url 'cos_virtual' %}">Cosul Meu</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'profile' %}">Profilul Meu</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'register' %}">Înregistrare</a></li>
+                    {% endif %}
                 </ul>
                 
                 <a href="{% url 'produse' %}" class="btn-explore">Exploreaza Produsele</a>

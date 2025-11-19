@@ -1,0 +1,142 @@
+{% extends 'baza.html' %}
+{% load static %}
+
+{% block content %}
+<section class="page-title-section">
+    <h1>Contactați-ne</h1>
+    <p>Aveți o întrebare sau o reclamație? Lăsați-ne un mesaj.</p>
+</section>
+
+<section id="contact-form-section" style="background: #fff; max-width: 900px; margin: 2rem auto; padding: 2rem; border-radius: 8px;">
+    
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message-success" style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 1rem; border-radius: 5px; margin-bottom: 1.5rem; text-align: center;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'contact' %}" class="contact-form" novalidate>
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="form-errors" style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 1rem; border-radius: 5px; margin-bottom: 1.5rem;">
+                {% for error in form.non_field_errors %}
+                    <p class="error-message" style="margin: 0;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.nume.id_for_label }}">{{ form.nume.label }}{% if form.nume.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+                {{ form.nume }}
+                {% if form.nume.errors %}
+                    <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.nume.errors|striptags }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.prenume.id_for_label }}">{{ form.prenume.label }}{% if form.prenume.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+                {{ form.prenume }}
+                {% if form.prenume.errors %}
+                    <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.prenume.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.cnp.id_for_label }}">{{ form.cnp.label }}{% if form.cnp.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+                {{ form.cnp }}
+                {% if form.cnp.help_text %}<small class="help-text" style="font-size: 0.85rem; color: #6c757d; margin-top: 0.25rem;">{{ form.cnp.help_text }}</small>{% endif %}
+                {% if form.cnp.errors %}
+                    <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.cnp.errors|striptags }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.data_nasterii.id_for_label }}">{{ form.data_nasterii.label }}{% if form.data_nasterii.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+                {{ form.data_nasterii }}
+                {% if form.data_nasterii.errors %}
+                    <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.data_nasterii.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}{% if form.email.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.email.errors|striptags }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.confirmare_email.id_for_label }}">{{ form.confirmare_email.label }}{% if form.confirmare_email.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+                {{ form.confirmare_email }}
+                {% if form.confirmare_email.errors %}
+                    <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.confirmare_email.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.tip_mesaj.id_for_label }}">{{ form.tip_mesaj.label }}{% if form.tip_mesaj.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+                {{ form.tip_mesaj }}
+                {% if form.tip_mesaj.errors %}
+                    <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.tip_mesaj.errors|striptags }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.minim_zile_asteptare.id_for_label }}">{{ form.minim_zile_asteptare.label }}{% if form.minim_zile_asteptare.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+                {{ form.minim_zile_asteptare }}
+                {% if form.minim_zile_asteptare.help_text %}
+                    <small class="help-text" style="font-size: 0.85rem; color: #6c757d; margin-top: 0.25rem;">{{ form.minim_zile_asteptare.help_text }}</small>
+                {% endif %}
+                {% if form.minim_zile_asteptare.errors %}
+                    <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.minim_zile_asteptare.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="{{ form.subiect.id_for_label }}">{{ form.subiect.label }}{% if form.subiect.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+            {{ form.subiect }}
+            {% if form.subiect.errors %}
+                <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.subiect.errors|striptags }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="{{ form.mesaj.id_for_label }}">{{ form.mesaj.label }}{% if form.mesaj.field.required %}*<span class="sr-only"> (obligatoriu)</span>{% endif %}</label>
+            {{ form.mesaj }}
+            {% if form.mesaj.errors %}
+                <div class="field-error" style="color: #721c24; font-size: 0.9rem; margin-top: 0.25rem;">{{ form.mesaj.errors|striptags }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn-submit-contact" style="background-color: #4a6d81; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background-color 0.3s ease;">Trimite Mesajul</button>
+    </form>
+    
+    <style>
+        .contact-form .form-group input,
+        .contact-form .form-group select,
+        .contact-form .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .contact-form .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</section>
+{% endblock %}

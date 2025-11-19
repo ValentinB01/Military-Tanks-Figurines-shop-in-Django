@@ -12,11 +12,105 @@
 </section>
 
 <section id="categorie-detaliu" class="serie-detaliu-produse">
-    <h3 class="produse-din-serie-titlu">Produse din această categorie:</h3>
+    <h3 class="produse-din-serie-titlu">Filtrează produsele din această categorie:</h3>
     
+    <form method="GET" action="" class="filter-form" id="filter-form">
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.nume_figurina.id_for_label }}">{{ form.nume_figurina.label }}</label>
+            {{ form.nume_figurina }}
+            {{ form.nume_figurina.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.ordonare.id_for_label }}">{{ form.ordonare.label }}</label>
+            {{ form.ordonare }}
+            {{ form.ordonare.errors }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.per_pagina.id_for_label }}">{{ form.per_pagina.label }}</label>
+            {{ form.per_pagina }}
+            {{ form.per_pagina.errors }}
+        </div>
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.pret_min.id_for_label }}">{{ form.pret_min.label }}</label>
+                {{ form.pret_min }}
+                {{ form.pret_min.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.pret_max.id_for_label }}">{{ form.pret_max.label }}</label>
+                {{ form.pret_max }}
+                {{ form.pret_max.errors }}
+            </div>
+        </div>
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.greutate_min.id_for_label }}">{{ form.greutate_min.label }}</label>
+                {{ form.greutate_min }}
+                {{ form.greutate_min.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.greutate_max.id_for_label }}">{{ form.greutate_max.label }}</label>
+                {{ form.greutate_max }}
+                {{ form.greutate_max.errors }}
+            </div>
+        </div>
+        <div class="form-group-inline">
+            <div class="form-group">
+                <label for="{{ form.data_lansare_min.id_for_label }}">{{ form.data_lansare_min.label }}</label>
+                {{ form.data_lansare_min }}
+                {{ form.data_lansare_min.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.data_lansare_max.id_for_label }}">{{ form.data_lansare_max.label }}</label>
+                {{ form.data_lansare_max }}
+                {{ form.data_lansare_max.errors }}
+            </div>
+        </div>
+        <div class="form-group-checkbox">
+            <strong>{{ form.stare.label }}</strong>
+            <div class="checkbox-container">{{ form.stare }}</div>
+        </div>
+        <div class="form-group-checkbox">
+            <strong>{{ form.tara_origine.label }}</strong>
+            <div class="checkbox-container">{{ form.tara_origine }}</div>
+        </div>
+        {{ form.id_categorie }}
+        <div class="form-group-checkbox">
+            <strong>{{ form.id_producator.label }}</strong>
+            <div class="checkbox-container">{{ form.id_producator }}</div>
+        </div>
+        <div class="form-group-checkbox">
+            <strong>{{ form.id_serie.label }}</strong>
+            <div class="checkbox-container">{{ form.id_serie }}</div>
+        </div>
+        <div class="form-group-checkbox">
+            <strong>{{ form.materiale.label }}</strong>
+            <div class="checkbox-container">{{ form.materiale }}</div>
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="btn-filter">Aplică Filtrele</button>
+            <a href="{% url 'categorie_detaliu' cat.nume_categorie %}" class="btn-reset" onclick="return confirm('Sunteți sigur că doriți să resetați filtrele? Toate selecțiile curente vor fi pierdute.');">Resetează Filtrele</a>
+        </div>
+    </form>
+    
+    <hr class="section-divider">
+
+    {% if repaginare_warning %}
+        <div class="repaginare-warning">
+            <strong>Notă:</strong> Ați schimbat numărul de produse pe pagină. Este posibil să fi sărit peste unele produse sau să le revedeți pe cele deja vizualizate.
+        </div>
+    {% endif %}
+
     <div class="lista-produse">
-        {% for p in produse %}
-        <article class="produs-card">
+        {% for p in page_obj %} <article class="produs-card">
             <a href="{% url 'produs_detaliu' p.id_figurina %}" class="card-image-link">
                 {% if p.imagine %}
                     <img src="{{ p.imagine.url }}" alt="{{ p.nume_figurina }}">
@@ -27,11 +121,9 @@
             
             <div class="card-continut">
                 <p class="card-categorie">
-                    <a href="{% url 'categorie_detaliu' p.id_categorie.nume_categorie %}"
-                       class="link-categorie" 
-                       style="--culoare-baza: {{ p.id_categorie.culoare }}; --culoare-activa: {{ p.id_categorie.culoare_activa }};">
+                    <span class="link-categorie" style="color: {{ p.id_categorie.culoare }};">
                         {{ p.id_categorie.nume_categorie }}
-                    </a>
+                    </span>
                 </p>
                 
                 <h3 class="card-titlu">
@@ -47,9 +139,27 @@
         </article>
         {% empty %}
             <p style="text-align: center; grid-column: 1 / -1; font-size: 1.1rem; color: #6c757d;">
-                Nu există (încă) produse listate în această categorie.
+                Nu există produse în această categorie care să corespundă filtrelor selectate.
             </p>
         {% endfor %}
+    </div>
+    
+    <div class="paginare">
+        <span class="pas-paginare">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if params_pagination %}&{{ params_pagination }}{% endif %}">&laquo; prima</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">precedenta</a>
+            {% endif %}
+
+            <span class="pagina-curenta">
+                Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">următoarea</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">ultima &raquo;</a>
+            {% endif %}
+        </span>
     </div>
     
 </section>
