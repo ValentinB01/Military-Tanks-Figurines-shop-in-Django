@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .models import Categorie, Producator, Figurina, Seria, AccessLog, CustomUser # Asigură-te că ai și CustomUser
+from .models import Categorie, Producator, Figurina, Seria, AccessLog, CustomUser, Vizualizare # Asigură-te că ai și CustomUser
 from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.utils import timezone
 from collections import OrderedDict
+from django.conf import settings
 import datetime
 from django.core.paginator import Paginator
 import re
@@ -12,11 +13,22 @@ import json
 import os
 import time
 from django.conf import settings
-
+import uuid
+import logging
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.core.mail import mail_admins
+from django.core.cache import cache
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.urls import reverse
+from django.core.mail import send_mass_mail
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 
 
 from .forms import (
@@ -24,11 +36,18 @@ from .forms import (
     ContactForm, 
     FigurinaModelForm,
     CustomUserCreationForm,
-    CustomLoginForm
+    CustomLoginForm,
+    PromotieForm
 )
 
 
 def log_view(request):
+    
+    is_admin_site = request.user.groups.filter(name='Administratori_site').exists()
+    
+    if not (request.user.is_superuser or is_admin_site):
+        return return_403_custom(request, "Acces Interzis", "Doar administratorii site-ului pot vedea logurile.")
+    
     all_logs = AccessLog.objects.all().order_by('-timestamp')
     total_logs = all_logs.count()
 
@@ -167,7 +186,12 @@ def get_ip_address(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+logger = logging.getLogger('proiectapp')
+
 def index(request):
+    if request.GET:
+        logger.debug(f"DEBUG: Filtrare produse cu parametrii: {request.GET.dict()}")
+    
     featured_series = Seria.objects.filter(
         disponibilitate=True,
         imagine_serie__isnull=False
@@ -177,6 +201,7 @@ def index(request):
         'ip_address': get_ip_address(request),
         'featured_series': featured_series
     }
+        
     return render(request, 'index.html', context)
 
 def despre(request):
@@ -192,6 +217,9 @@ def cos_virtual(request):
     return render(request, 'in_lucru.html', context)
 
 def produse(request):
+    if request.GET:
+        logger.debug(f"DEBUG: Filtrare produse cu parametrii: {request.GET.dict()}")
+    
     figurine_list = Figurina.objects.select_related(
         'id_categorie', 'id_producator', 'id_serie'
     ).prefetch_related('materiale', 'seturi_accesorii').all()
@@ -202,6 +230,8 @@ def produse(request):
     elemente_pe_pagina = 5
     repaginare_warning = False
     page_number_str = request.GET.get('page')
+    if page_number_str and not page_number_str.isdigit():
+        logger.warning(f"WARNING: Parametru de paginare invalid primit: {page_number_str}")
 
     if request.GET:
         if form.is_valid():
@@ -317,11 +347,27 @@ def produse(request):
 
 def produs_detaliu(request, id_figurina):
     figurina = get_object_or_404(Figurina, id_figurina=id_figurina)
+    
+    if figurina.stoc_disponibil < 3:
+        logger.warning(f"WARNING: Stoc critic pentru produsul {figurina.nume_figurina} (ID: {id_figurina})")
+    
+    if request.user.is_authenticated:
+        Vizualizare.objects.create(
+            user=request.user,
+            produs=figurina
+        )
+        
+        N = 5
+        vizualizari_user = Vizualizare.objects.filter(user=request.user).order_by('data_vizualizare')
+        
+        if vizualizari_user.count() > N:
+            vizualizari_user.first().delete()
     context = {
         'fig': figurina,
         'ip_address': get_ip_address(request)
     }
     return render(request, 'produs_detaliu.html', context)
+
 
 def categorie_detaliu(request, nume_categorie):
     categorie = get_object_or_404(Categorie, nume_categorie=nume_categorie)
@@ -445,28 +491,29 @@ def categorie_detaliu(request, nume_categorie):
 
 
 def adauga_produs(request):
+    if not request.user.has_perm('proiectapp.add_figurina'):
+        cnt = request.session.get('cnt_403', 0) + 1
+        request.session['cnt_403'] = cnt
+        
+        context = {
+            'titlu': 'Eroare adaugare produse',
+            'mesaj_personalizat': 'Nu ai voie să adaugi figurine.',
+            'count': cnt,
+            'n_max': getattr(settings, 'N_MAX_403', 5)
+        }
+        return render(request, '403.html', context, status=403)
+
     if request.method == 'POST':
         form = FigurinaModelForm(request.POST, request.FILES)
-        
         if form.is_valid():
-            
             figurina = form.save(commit=False)
-            
             pret_ach = form.cleaned_data['pret_achizitie']
             adaos = form.cleaned_data['procentaj_adaos']
-            stoc = form.cleaned_data['stoc_disponibil']
-            
             figurina.pret = pret_ach * (1 + (adaos / 100))
-            figurina.stoc_disponibil = stoc
-            
             figurina.save()
-            
             form.save_m2m()
-            
-            
             messages.success(request, f"Produsul '{figurina.nume_figurina}' a fost adăugat cu succes!")
             return redirect('produse') 
-    
     else:
         form = FigurinaModelForm()
 
@@ -475,7 +522,6 @@ def adauga_produs(request):
         'ip_address': get_ip_address(request)
     }
     return render(request, 'adauga_produs.html', context)
-
 
 
 
@@ -519,6 +565,7 @@ def contact(request):
         form = ContactForm(request.POST)
         
         if form.is_valid():
+            logger.info(f"INFO: Mesaj nou de contact primit de la {form.cleaned_data['email']}")
             cd = form.cleaned_data
             today = datetime.date.today()
             data_nasterii = cd.get('data_nasterii')
@@ -567,27 +614,34 @@ def contact(request):
 
             try:
                 os.makedirs(MESAJE_DIR, exist_ok=True)
-                
                 with open(file_path, 'w', encoding='utf-8') as f:
                     json.dump(data_to_save, f, ensure_ascii=False, indent=4)
                 
-                print(f"Mesaj salvat in {file_name}")
-                print(json.dumps(data_to_save, indent=2, ensure_ascii=False))
-
-                messages.success(request, 'Mesajul dumneavoastra a fost trimis si salvat cu succes!')
+                messages.success(request, 'Mesajul a fost trimis!')
                 return redirect('contact')
 
             except Exception as e:
-                print(f"Eroare la salvarea mesajului JSON: {e}")
-                form.add_error(None, f"Eroare interna la salvarea mesajului. Va rugam incercati din nou. ({e})")
-    else:
-        form = ContactForm()
-
-    context = {
-        'ip_address': get_ip_address(request),
-        'form': form,
-    }
-    return render(request, 'contact.html', context)
+                logger.error(f"ERROR: Eroare la salvarea mesajului JSON: {str(e)}")
+                subiect = "Eroare la salvare mesaj contact"
+                mesaj_text = f"Eroare: {str(e)}"
+                
+                mesaj_html = f"""
+                    <h1 style="color: red;">{subiect}</h1>
+                    <p>A apărut o excepție la salvarea fișierului JSON:</p>
+                    <div style="background-color: red; color: white; padding: 10px;">
+                        {str(e)}
+                    </div>
+                """
+                
+                mail_admins(
+                    subject=subiect,
+                    message=mesaj_text,
+                    html_message=mesaj_html,
+                    fail_silently=True
+                )
+                
+                print(f"!!! EROARE CRITICĂ: {e}")
+                form.add_error(None, "Eroare internă. Administratorii au fost notificați.")
 
 
 
@@ -602,21 +656,70 @@ def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user) 
-            messages.success(request, 'Inregistrare reusita! Bine ai venit.')
-            return redirect('profile')
+            user = form.save(commit = False)
+            
+            cod_unic = str(uuid.uuid4())
+            user.cod = cod_unic
+            user.email_confirmat = False
+            user.save()
+            
+            subiect = "Confirmare cont - Tankeria"
+            link_confirmare = request.build_absolute_uri(reverse('confirma_mail', args=[user.cod]))
+            
+            context_email = {
+                'user': user,
+                'link_confirmare': link_confirmare
+            }
+            
+            html_message = render_to_string('confirmare_email.html', context_email)
+            plain_message = strip_tags(html_message)
+            
+            send_mail(
+                subiect,
+                plain_message,
+                settings.DEFAULT_FORM_EMAIL,
+                [user.email],
+                html_message=html_message,
+                fail_silently=False
+            )
+
+            messages.success(request, 'Cont creat! Te rugăm să verifici email-ul pentru confirmare.')
+            return redirect('login') 
     else:
         form = CustomUserCreationForm()
+    
     context = {'form': form, 'ip_address': get_ip_address(request)}
     return render(request, 'autentificare/register.html', context)
+
+
+def confirma_mail(request, cod):
+    try:
+        user = CustomUser.objects.get(cod=cod)
+        
+        if user.email_confirmat:
+            messages.info(request, "Adresa de email este deja confirmată.")
+        else:
+            user.email_confirmat = True
+            user.save()
+            messages.success(request, "Email confirmat cu succes! Acum te poți loga.")
+            
+    except CustomUser.DoesNotExist:
+        messages.error(request, "Cod de confirmare invalid sau expirat.")
+        
+    return redirect('login')
+
 
 
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('profile')
+
     if request.method == 'POST':
         form = CustomLoginForm(request, data=request.POST)
+        
+        ip = get_ip_address(request)
+        cache_key = f"failed_login_{ip}"
+        
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
@@ -625,12 +728,19 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             
             if user is not None:
+                if not user.email_confirmat:
+                    if user.blocat:
+                        messages.error(request, 'Contul tău a fost blocat de un moderator. Nu te poți loga.')
+                        return redirect('login')
+                
+                cache.delete(cache_key)
+                logger.info(f"INFO: Utilizatorul {user.username} s-a logat cu succes.")
                 login(request, user)
+                
                 if remember_me:
-                    request.session.set_expiry(60 * 60 * 24) 
+                    request.session.set_expiry(60 * 60 * 24)
                 else:
                     request.session.set_expiry(0)
-                
                 request.session['profil'] = {
                     'username': user.username,
                     'email': user.email,
@@ -643,17 +753,57 @@ def login_view(request):
                 
                 messages.info(request, f'Te-ai logat cu succes ca {username}.')
                 return redirect('profile')
+            
             else:
-                messages.error(request, 'Nume de utilizator sau parola incorecta.')
+                username_incercat = form.cleaned_data.get('username', 'necunoscut')
+                logger.error(f"ERROR: Tentativa de logare esuata pentru user: {form.cleaned_data.get('username')}")
+                attempts = cache.get(cache_key, [])
+                current_time = time.time()
+                
+                attempts = [t for t in attempts if current_time - t < 120]
+                
+                attempts.append(current_time)
+                
+                cache.set(cache_key, attempts, timeout=300)
+                
+                if len(attempts) >= 3:
+                    logger.critical(f"CRITICAL: Posibil atac Brute-Force de la IP: {ip}")
+                    subiect = "Logari suspecte"
+                    mesaj_text = f"Username folosit: {username_incercat}\nIP: {ip}\nAu fost detectate 3 incercari esuate in ultimele 2 minute."
+                    
+                    mesaj_html = f"""
+                        <h1 style="color: red;">{subiect}</h1>
+                        <p><strong>Username incercat:</strong> {username_incercat}</p>
+                        <p><strong>IP Sursă:</strong> {ip}</p>
+                        <p>Sistemul a detectat incercari repetate de autentificare esuata.</p>
+                    """
+                    
+                    mail_admins(
+                        subject=subiect,
+                        message=mesaj_text,
+                        html_message=mesaj_html,
+                        fail_silently=True
+                    )
+                    
+                messages.error(request, 'Nume de utilizator sau parolă incorectă.')
+                
+        else:
+            messages.error(request, 'Formular invalid. Verifică datele introduse.')
+
     else:
         form = CustomLoginForm()
         
     context = {'form': form, 'ip_address': get_ip_address(request)}
     return render(request, 'autentificare/login.html', context)
 
-
 @login_required
 def logout_view(request):
+    try:
+        permisiune = Permission.objects.get(codename='vizualizeaza_oferta')
+        request.user.user_permissions.remove(permisiune)
+    except Permission.DoesNotExist:
+        pass
+
     if 'profil' in request.session:
         del request.session['profil']
         
@@ -687,3 +837,126 @@ def change_password_view(request):
         
     context = {'form': form, 'ip_address': get_ip_address(request)}
     return render(request, 'autentificare/change_password.html', context)
+
+def promotii_view(request):
+    if not request.user.is_superuser:
+        return redirect('index')
+
+    if request.method == 'POST':
+        form = PromotieForm(request.POST)
+        if form.is_valid():
+            promotie = form.save(commit=False)
+            
+            zile = form.cleaned_data['valabilitate_zile']
+            promotie.data_expirare = timezone.now() + datetime.timedelta(days=zile)
+            promotie.save()
+            
+            form.save_m2m() 
+            
+            categorii_selectate = form.cleaned_data['categorii']
+            K = 3
+            
+            mesaje_de_trimis = []
+            
+            for categorie in categorii_selectate:
+                users_target = CustomUser.objects.filter(
+                    vizualizare__produs__id_categorie=categorie
+                ).annotate(
+                    nr_viz=Count('vizualizare')
+                ).filter(nr_viz__gte=K).distinct()
+                
+                nume_template = f"template_{categorie.nume_categorie}.txt"
+                cale_template = os.path.join(settings.BASE_DIR, 'proiectapp', 'templates', 'email', nume_template)
+                
+                continut_template = ""
+                try:
+                    with open(cale_template, 'r') as f:
+                        continut_template = f.read()
+                except FileNotFoundError:
+                    continut_template = "Salut! Avem o promoție specială: {subiect}. Expiră la {data_expirare}. Detalii: {mesaj}"
+
+                for user in users_target:
+                    mesaj_final = continut_template.format(
+                        nume_client=f"{user.first_name} {user.last_name}",
+                        subiect=promotie.subiect,
+                        data_expirare=promotie.data_expirare.strftime('%d-%m-%Y'),
+                        mesaj=promotie.mesaj,
+                        alte_date="Reduceri masive la tancuri!"
+                    )
+                    
+                    mesaje_de_trimis.append((
+                        promotie.subiect,
+                        mesaj_final,
+                        settings.DEFAULT_FORM_EMAIL,
+                        [user.email]
+                    ))
+            
+            if mesaje_de_trimis:
+                send_mass_mail(tuple(mesaje_de_trimis), fail_silently=False)
+                messages.success(request, f"Promoția a fost trimisă la {len(mesaje_de_trimis)} utilizatori!")
+            else:
+                messages.warning(request, "Nu au fost găsiți utilizatori eligibili (care au vizualizat produse).")
+                
+            return redirect('promotii')
+            
+    else:
+        form = PromotieForm()
+
+    return render(request, 'promotii.html', {'form': form})
+
+
+def view_403(request, exception=None):
+
+    cnt = request.session.get('cnt_403', 0) + 1
+    request.session['cnt_403'] = cnt
+    
+    context = {
+        'titlu': '',
+        'mesaj_personalizat': 'Nu aveți permisiunea de a accesa această resursă.',
+        'count': cnt,
+        'n_max': settings.N_MAX_403
+    }
+    
+    return render(request, '403.html', context, status=403)
+
+def return_403_custom(request, titlu, mesaj):
+    cnt = request.session.get('cnt_403', 0) + 1
+    request.session['cnt_403'] = cnt
+    context = {
+        'titlu': titlu,
+        'mesaj_personalizat': mesaj,
+        'count': cnt,
+        'n_max': getattr(settings, 'N_MAX_403', 5)
+    }
+    return render(request, '403.html', context, status=403)
+
+def accesare_oferta(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    content_type = ContentType.objects.get_for_model(CustomUser)
+    permisiune, created = Permission.objects.get_or_create(
+        codename='vizualizeaza_oferta',
+        defaults={
+            'name': 'Poate vizualiza oferta speciala',
+            'content_type': content_type,
+        }
+    )
+    request.user.user_permissions.add(permisiune)
+    
+    return redirect('oferta')
+
+def oferta_view(request):
+    if not request.user.is_authenticated or not request.user.has_perm('proiectapp.vizualizeaza_oferta'):
+        cnt = request.session.get('cnt_403', 0) + 1
+        request.session['cnt_403'] = cnt
+        
+        context = {
+            'titlu': 'Eroare afisare oferta',
+            'mesaj_personalizat': 'Nu ai voie să vizualizezi oferta',
+            'count': cnt,
+            'n_max': getattr(settings, 'N_MAX_403', 5)
+        }
+        return render(request, '403.html', context, status=403)
+
+    return render(request, 'oferta.html')

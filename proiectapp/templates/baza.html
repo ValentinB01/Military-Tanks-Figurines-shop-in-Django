@@ -8,6 +8,59 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+<style>
+    #banner-oferta {
+        display: none; /* Ascuns implicit */
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #ffc107; /* Galben specific ofertelor */
+        color: #000;
+        padding: 20px;
+        border: 2px solid #e0a800;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        z-index: 9999;
+        cursor: pointer;
+        animation: slideIn 1s ease-out;
+    }
+
+    @keyframes slideIn {
+        from { right: -300px; opacity: 0; }
+        to { right: 20px; opacity: 1; }
+    }
+
+    #banner-oferta:hover {
+        background-color: #e0a800;
+        transform: scale(1.05);
+        transition: 0.3s;
+    }
+</style>
+
+<a id="banner-link" href="{% url 'accesare_oferta' %}" style="text-decoration: none;">
+    <div id="banner-oferta">
+        <h3 style="margin: 0;"> OFERTA LIMITATA!</h3>
+        <p style="margin: 5px 0 0 0;">Click pentru <strong>REDUCERE 50%</strong></p>
+    </div>
+</a>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var userIsAuthenticated = "{{ user.is_authenticated }}" === "True";
+        
+        if (userIsAuthenticated) {
+            var sansa = Math.random();
+            console.log("Sansa oferta: " + sansa); 
+
+            if (sansa < 0.3) {
+                var banner = document.getElementById('banner-oferta');
+                if (banner) {
+                    banner.style.display = 'block';
+                }
+            }
+        }
+    });
+</script>
 <body>
     <header class="new-header">
         <div class="header-content">
@@ -46,6 +99,21 @@
                 </ul>
                 
                 <a href="{% url 'produse' %}" class="btn-explore">Exploreaza Produsele</a>
+
+                {% if perms.proiectapp.add_figurina %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'adauga_produs' %}" style="color: orange;">Adaugă Produs</a>
+                </li>
+                {% endif %}
+
+                {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'log' %}" style="color: red;">Loguri</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'info' %}" style="color: red;">Info Server</a>
+                </li>
+                {% endif %}
             </nav>
         </div>
     </header>

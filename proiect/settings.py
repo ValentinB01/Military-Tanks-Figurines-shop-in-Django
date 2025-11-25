@@ -151,3 +151,70 @@ EMAIL_HOST_USER = 'test.tweb.node@gmail.com'
 EMAIL_HOST_PASSWORD = 'xdqswyrleddghrgm'
 DEFAULT_FORM_EMAIL = 'Da-Boss <test.tweb.node@gmail.com>'
 
+
+ADMINS = [
+    ('Admin Nume', 'admin@example.com'),
+]
+SERVER_EMAIL = 'server@tweb-node.com'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file_debug': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'debug.log'),
+            'formatter': 'verbose',
+        },
+        'file_info': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'info.log'),
+            'formatter': 'verbose',
+        },
+        'file_warning': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'warning.log'),
+            'formatter': 'verbose',
+        },
+        'file_error': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'error.log'),
+            'formatter': 'verbose',
+        },
+        'file_critical': {
+            'level': 'CRITICAL',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'critical.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'proiectapp': { 
+            'handlers': ['console', 'file_debug', 'file_info', 'file_warning', 'file_error', 'file_critical'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+N_MAX_403 = 5

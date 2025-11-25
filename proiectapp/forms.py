@@ -4,12 +4,18 @@ from .models import Categorie, Producator, Seria, Figurina, Material
 from django.forms import ValidationError
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.mail import mail_admins
+from django.utils.html import strip_tags
 from .models import CustomUser
+from .models import Promotie
 import datetime
 import re
+import logging
 from .models import (
     Categorie, Producator, Seria, Figurina, Material
 )
+
+logger = logging.getLogger(__name__)
 
 class FigurinaFiltruForm(forms.Form):
 
@@ -570,7 +576,27 @@ class CustomUserCreationForm(UserCreationForm):
             raise ValidationError("Va rugam sa introduceti un oras valid.", code='oras_nespecificat')
         return oras
     
-    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if username.lower() == 'admin':
+            logger.critical("CRITICAL: Tentativă de înregistrare cu username interzis 'ADMIN'!")
+            email_incercare = self.data.get('email', 'Nespecificat')
+            subiect = "cineva incearca sa ne preia site-ul"
+            mesaj_text = f"Tentativă de înregistrare cu user 'admin'. Email folosit: {email_incercare}"
+            mesaj_html = f"""
+                <h1 style="color: red;">{subiect}</h1>
+                <p>{mesaj_text}</p>
+            """
+            mail_admins(
+                subject=subiect,
+                message=mesaj_text,
+                html_message=mesaj_html,
+                fail_silently=True
+            )
+            
+            raise ValidationError("Acest nume de utilizator nu este permis.", code='forbidden_username')
+            
+        return username
     
 
 class CustomLoginForm(AuthenticationForm):
@@ -614,3 +640,19 @@ class FigurinaModelForm(forms.ModelForm):
         }
         
         
+class PromotieForm(forms.ModelForm):
+    categorii = forms.ModelMultipleChoiceField(
+        queryset=Categorie.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True,
+        label="Selectează categoriile (Doar cele cu template existent!)"
+    )
+    
+    valabilitate_zile = forms.IntegerField(min_value=1, initial=7, label="Valabilitate (zile)")
+
+    class Meta:
+        model = Promotie
+        fields = ['nume', 'subiect', 'mesaj', 'categorii']
+        widgets = {
+            'mesaj': forms.Textarea(attrs={'rows': 4}),
+        }

@@ -1,0 +1,34 @@
+{% extends 'baza.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <p class="lead">
+        {% if user.is_authenticated %}
+            Salut {{ user.username }}
+        {% else %}
+            Salut anonim
+        {% endif %}
+    </p>
+
+    <h1>{{ titlu|default:"Eroare 403" }}</h1>
+
+    <hr>
+
+    <div class="alert alert-danger">
+        {{ mesaj_personalizat }}
+    </div>
+
+    <div class="mt-4">
+        <p>Numar de accesari interzise in aceasta sesiune: <strong>{{ count }}</strong></p>
+
+        {% if count > n_max %}
+            <p style="color: red; font-weight: bold; font-size: 1.2em;">
+                ATENȚIE: Ai incercat de prea multe ori sa accesezi resurse interzise!
+            </p>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'index' %}" class="btn btn-primary mt-3">Înapoi la prima pagină</a>
+</div>
+{% endblock %}

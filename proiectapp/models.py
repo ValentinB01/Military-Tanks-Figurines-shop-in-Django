@@ -51,6 +51,21 @@ class CustomUser(AbstractUser):
         help_text="Codul postal (optional)."
     )
     
+    cod = models.CharField(
+        max_length = 100,
+        blank = True,
+        null = True
+    )
+    
+    email_confirmat = models.BooleanField(
+        default=False
+        )
+    
+    blocat = models.BooleanField(
+        default=False, 
+        help_text="Daca este bifat, utilizatorul nu se poate loga pe site."
+    )
+    
     def __str__(self):
         return self.username
 
@@ -270,3 +285,27 @@ class FigurinaSetAccesorii(models.Model):
     compatibil_perfect = models.BooleanField(default=True)
     class Meta:
         unique_together = ['figurina', 'set_accesorii']
+        
+        
+
+
+class Vizualizare(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    produs = models.ForeignKey(Figurina, on_delete=models.CASCADE)
+    data_vizualizare = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.produs.nume_figurina}"
+
+class Promotie(models.Model):
+    nume = models.CharField(max_length=100)
+    data_creare = models.DateTimeField(auto_now_add=True)
+    data_expirare = models.DateTimeField()
+    
+    subiect = models.CharField(max_length=255)
+    mesaj = models.TextField()
+    
+    categorii = models.ManyToManyField(Categorie)
+
+    def __str__(self):
+        return self.nume

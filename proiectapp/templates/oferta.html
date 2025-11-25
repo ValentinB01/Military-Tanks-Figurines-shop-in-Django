@@ -1,0 +1,26 @@
+{% extends 'baza.html' %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <div class="p-5 mb-4 bg-light rounded-3 border border-success">
+        <h1 class="display-4 text-success fw-bold">Felicitări!</h1>
+        <hr class="my-4">
+        <p class="lead">Ai deblocat accesul la reducerile exclusive de 50%.</p>
+        
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="card text-white bg-danger mb-3">
+                    <div class="card-header">Cod Promotional</div>
+                    <div class="card-body">
+                        <h2 class="card-title">TANK50OFF</h2>
+                        <p class="card-text">Foloseste acest cod la checkout pentru orice figurina.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <p class="mt-3 text-muted">Atentie: Aceasta oferta expira daca te deloghezi.</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'produse' %}" role="button">Vezi Produsele</a>
+    </div>
+</div>
+{% endblock %}

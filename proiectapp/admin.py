@@ -1,121 +1,55 @@
 from django.contrib import admin
-from .models import *
 from django.contrib.auth.admin import UserAdmin
+from .models import (
+    CustomUser, AccessLog, Categorie, Producator, 
+    Seria, SetAccessorii, Material, Figurina, 
+    FigurinaMaterial, FigurinaSetAccesorii
+)
 
-@admin.register(Categorie)
-class CategorieAdmin(admin.ModelAdmin):
-    list_display = ['id_categorie', 'nume_categorie', 'activa']
-    list_per_page = 5
-    list_filter = ['activa']
-    search_fields = ['id_categorie', 'nume_categorie']
-    ordering = ['nume_categorie']
-    list_editable = ['activa']
-
-@admin.register(Producator)
-class ProducatorAdmin(admin.ModelAdmin):
-    list_display = ['id_producator', 'nume_producator', 'tara_origine', 'activ', 'email']
-    list_filter = ['activ', 'tara_origine']
-    search_fields = ['nume_producator', 'tara_origine']
-    list_editable = ['activ']
-
-@admin.register(Seria)
-class SeriaAdmin(admin.ModelAdmin):
-    list_display = ['id_serie', 'nume_serie', 'scala', 'an_lansare', 'disponibilitate', 'id_producator']
-    list_filter = ['scala', 'disponibilitate', 'an_lansare', 'id_producator']
-    search_fields = ['id_serie', 'nume_serie']
-    list_editable = ['disponibilitate']
-
-@admin.register(SetAccessorii)
-class SetAccessoriiAdmin(admin.ModelAdmin):
-    list_display = ['id_set', 'nume_set', 'tip_accesorii', 'nr_piese', 'editie_speciala', 'data_creare']
-    list_filter = ['tip_accesorii', 'editie_speciala']
-    search_fields = ['nume_set', 'compatibilitate']
-    readonly_fields = ['data_creare']  
-
-@admin.register(Material)
-class MaterialAdmin(admin.ModelAdmin):
-    list_display = ['id_material', 'tip_material', 'culoare', 'textura', 'rezistent_la_apa']
-    list_filter = ['textura', 'rezistent_la_apa']
-    search_fields = ['tip_material', 'culoare']
-
-class FigurinaMaterialInline(admin.TabularInline):
-    model = FigurinaMaterial
-    extra = 1 
-    verbose_name = "Material"
-    verbose_name_plural = "Materiale utilizate"
-
-class FigurinaSetAccesoriiInline(admin.TabularInline):
-    model = FigurinaSetAccesorii
-    extra = 1
-    verbose_name = "Set accesorii compatibil"
-    verbose_name_plural = "Seturi accesorii compatibile"
-
-@admin.register(Figurina)
-class FigurinaAdmin(admin.ModelAdmin):
-    list_display = [
-        'id_figurina', 
-        'nume_figurina', 
-        'pret', 
-        'stoc_disponibil', 
-        'tara_origine', 
-        'stare',
-        'id_categorie',
-        'data_adaugare'
-    ]
-    list_per_page = 5
-    list_filter = [
-        'tara_origine',
-        'stare', 
-        'id_categorie',
-        'id_producator',
-        'data_lansare'
-    ]
-    search_fields = [
-        'nume_figurina',
-        'descriere'
-    ]
-    ordering = ['-data_adaugare']
-    list_editable = [
-        'pret',
-        'stoc_disponibil'
-    ]
-    readonly_fields = [
-        'data_adaugare'
-    ]
-    list_select_related = ['id_categorie', 'id_producator', 'id_serie']
-    inlines = [FigurinaMaterialInline, FigurinaSetAccesoriiInline]
-    fieldsets = (
-        ('Informatii de baza', {
-            'fields': (
-                'nume_figurina',
-                'imagine', 
-                'pret', 
-                'greutate', 
-                'stoc_disponibil',
-                'data_lansare',
-                'data_adaugare'
-            )
-        }),
-        ('Categorizare', {
-            'fields': (
-                'tara_origine',
-                'stare',
-                'id_categorie',
-                'id_producator', 
-                'id_serie'
-            )
-        }),
-        ('Descriere', {
-            'fields': ('descriere',),
-            'classes': ('collapse',)  
-        }),
-    )
-    
-@admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-        add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Date Suplimentare', {'fields': ('telefon', 'data_nasterii', 'adresa_oras')}),
+    fieldsets = UserAdmin.fieldsets + (
+        ('Date Suplimentare', {
+            'fields': (
+                'telefon', 
+                'data_nasterii', 
+                'adresa_strada', 
+                'adresa_oras', 
+                'adresa_judet', 
+                'adresa_cod_postal',
+                'cod',
+                'email_confirmat',
+                'blocat'
+            )
+        }),
     )
-        fieldsets = UserAdmin.fieldsets + (
-        ('Date Suplimentare', {'fields': ('telefon', 'data_nasterii', 'adresa_strada', 'adresa_oras', 'adresa_judet', 'adresa_cod_postal')}),
-    )
+
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return []
+
+        if request.user.groups.filter(name='Moderatori').exists():
+            campuri_editabile = ['first_name', 'last_name', 'email', 'blocat']
+            
+            toate_campurile = [f.name for f in self.model._meta.fields]
+            
+            campuri_extra = [
+                'password', 'last_login', 'date_joined', 
+                'is_superuser', 'is_staff', 'is_active', 
+                'groups', 'user_permissions'
+            ]
+            toate_campurile.extend(campuri_extra)
+
+            return [f for f in toate_campurile if f not in campuri_editabile]
+
+        return super().get_readonly_fields(request, obj)
+
+admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(AccessLog)
+admin.site.register(Categorie)
+admin.site.register(Producator)
+admin.site.register(Seria)
+admin.site.register(SetAccessorii)
+admin.site.register(Material)
+admin.site.register(Figurina)
+admin.site.register(FigurinaMaterial)
+admin.site.register(FigurinaSetAccesorii)
