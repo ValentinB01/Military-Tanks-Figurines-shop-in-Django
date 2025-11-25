@@ -6,7 +6,8 @@
     <h2>Produsele Noastre</h2>
     
     <form method="GET" action="{% url 'produse' %}" class="filter-form" id="filter-form">
-        
+        <input type="hidden" name="page" value="{{ page_obj.number }}">
+
         {% if form.non_field_errors %}
             {% endif %}
         
@@ -103,26 +104,26 @@
         </div>
 
         <div class="form-buttons">
-            <button type="submit" class="btn-filter">Aplică Filtrele</button>
-            <a href="{% url 'produse' %}" class="btn-reset" onclick="return confirm('Sunteți sigur că doriți să resetați filtrele? Toate selecțiile curente vor fi pierdute.');">Resetează Filtrele</a>
+            <button type="submit" class="btn-filter">Aplica Filtrele</button>
+            <a href="{% url 'produse' %}" class="btn-reset" onclick="return confirm('Sunteti sigur ca doriti sa resetezi filtrele?');">Reseteaza Filtrele</a>
     </form>
     <hr class="section-divider">
     
     {% if repaginare_warning %}
         <div class="repaginare-warning">
-            <strong>Notă:</strong> Ați schimbat numărul de produse pe pagină. Este posibil să fi sărit peste unele produse sau să le revedeți pe cele deja vizualizate.
+            <strong>Nota:</strong> Ati schimbat numarul de produse pe pagina. Este posibil sa fi sarit peste unele produse sau le puteti vedea iar pe cele deja vizualizate.
         </div>
     {% endif %}
     
     <div class="sortare-container">
-        <span>Sortează după preț:</span>
+        <span>Sorteaza dupa pret:</span>
         <a href="?sort=a{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
             class="sort-link {% if request.GET.sort == 'a' %}active{% endif %}">
-            Crescător
+            Crescator
         </a>
         <a href="?sort=d{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
             class="sort-link {% if request.GET.sort == 'd' %}active{% endif %}">
-            Descrescător
+            Descrescator
         </a>
         <a href="?{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
             class="sort-link {% if not request.GET.sort and not request.GET.sort == 'd' %}active{% endif %}">
@@ -162,7 +163,7 @@
             </div>
         </article>
         {% empty %}
-        <p>Nu au fost găsite produse care să corespundă filtrelor selectate.</p>
+        <p>Nu au fost gasite produse care sa corespunda filtrelor selectate.</p>
         {% endfor %}
     </div>
 
@@ -178,7 +179,7 @@
             </span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">următoarea</a>
+                <a href="?page={{ page_obj.next_page_number }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">urmatoarea</a>
                 <a href="?page={{ page_obj.paginator.num_pages }}{% if params_pagination %}&{{ params_pagination }}{% endif %}">ultima &raquo;</a>
             {% endif %}
         </span>

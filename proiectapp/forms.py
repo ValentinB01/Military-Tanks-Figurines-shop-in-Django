@@ -16,38 +16,38 @@ class FigurinaFiltruForm(forms.Form):
     nume_figurina = forms.CharField(
         label='Nume',
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Caută după nume...'})
+        widget=forms.TextInput(attrs={'placeholder': 'Cauta dupa nume'})
     )
     
     pret_min = forms.DecimalField(
-        label='Preț minim',
+        label='Pret minim',
         required=False,
-        widget=forms.NumberInput(attrs={'placeholder': 'Preț min'})
+        widget=forms.NumberInput(attrs={'placeholder': 'Pret min'})
     )
     pret_max = forms.DecimalField(
-        label='Preț maxim',
+        label='Pret maxim',
         required=False,
-        widget=forms.NumberInput(attrs={'placeholder': 'Preț max'})
+        widget=forms.NumberInput(attrs={'placeholder': 'Pret max'})
     )
 
     greutate_min = forms.DecimalField(
-        label='Greutate minimă (kg)',
+        label='Greutate minima (kg)',
         required=False,
         widget=forms.NumberInput(attrs={'placeholder': 'Greutate min'})
     )
     greutate_max = forms.DecimalField(
-        label='Greutate maximă (kg)',
+        label='Greutate maxima (kg)',
         required=False,
         widget=forms.NumberInput(attrs={'placeholder': 'Greutate max'})
     )
     
     data_lansare_min = forms.DateField(
-        label='Lansat după data',
+        label='Lansat dupa data',
         required=False,
         widget=forms.DateInput(attrs={'type': 'date'})
     )
     data_lansare_max = forms.DateField(
-        label='Lansat înainte de data',
+        label='Lansat inainte de data',
         required=False,
         widget=forms.DateInput(attrs={'type': 'date'})
     )
@@ -60,14 +60,14 @@ class FigurinaFiltruForm(forms.Form):
     )
 
     tara_origine = forms.MultipleChoiceField(
-        label='Țara de origine',
+        label='Tara de origine',
         required=False,
         choices=Figurina.TARA_ORIGINE_CHOICES,
         widget=forms.CheckboxSelectMultiple
     )
     
     ordonare = forms.ChoiceField(
-        label='Ordonează după',
+        label='Ordoneaza dupa',
         required=False,
         choices=[
             ('nume_figurina', 'Nume (A-Z)'),
@@ -80,13 +80,13 @@ class FigurinaFiltruForm(forms.Form):
     )
     
     per_pagina = forms.ChoiceField(
-        label='Produse pe pagină',
+        label='Produse pe pagina',
         required=False,
         choices=[
-            ('5', '5 pe pagină'),
-            ('10', '10 pe pagină'),
-            ('20', '20 pe pagină'),
-            ('50', '50 pe pagină'),
+            ('5', '5 pe pagina'),
+            ('10', '10 pe pagina'),
+            ('20', '20 pe pagina'),
+            ('50', '50 pe pagina'),
         ],
         initial='5',
         widget=forms.Select
@@ -100,7 +100,7 @@ class FigurinaFiltruForm(forms.Form):
     )
     
     id_producator = forms.ModelMultipleChoiceField(
-        label='Producător',
+        label='Producator',
         queryset=Producator.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple
@@ -115,12 +115,11 @@ class FigurinaFiltruForm(forms.Form):
     
     materiale = forms.ModelMultipleChoiceField(
         label='Materiale',
-        queryset=Material.objects.none(), #
+        queryset=Material.objects.none(), 
         required=False,
         widget=forms.CheckboxSelectMultiple
     )
-
-
+    
     def __init__(self, *args, **kwargs):
         self.categorie_preselectata = kwargs.pop('categorie_preselectata', None)
         super().__init__(*args, **kwargs)
@@ -130,8 +129,8 @@ class FigurinaFiltruForm(forms.Form):
         self.fields['materiale'].queryset = Material.objects.all()
         if self.categorie_preselectata:
             self.initial['id_categorie'] = self.categorie_preselectata
-            self.fields['id_categorie'].widget = forms.HiddenInput()
-    
+            self.fields['id_categorie'].widget = forms.HiddenInput(attrs={'readonly': 'readonly'})    
+            
     def clean(self):
         cleaned_data = super().clean()
         
@@ -170,36 +169,156 @@ class FigurinaFiltruForm(forms.Form):
                 submitted_categories.first() != self.categorie_preselectata):
                 
                 raise ValidationError(
-                    f"A fost detectată o nepotrivire. Acest filtru este valabil doar pentru categoria '{self.categorie_preselectata.nume_categorie}'. Vă rugăm resetați filtrele.",
+                    f"A fost detectata o nepotrivire. Acest filtru este valabil doar pentru categoria '{self.categorie_preselectata.nume_categorie}'. Vă rugăm resetați filtrele.",
                     code='categorie_modificata'
                 )
-
         return cleaned_data
+    
+    
+    
+    
+def validate_fara_linkuri(value):
+    if re.search(r'https?:\/\/', str(value).lower()):
+        raise ValidationError(
+            "Acest camp nu poate contine link-uri (http:// sau https://).",
+            code='link_interzis'
+        )
+
+def validate_incepe_cu_majuscula(value):
+    if not str(value)[0].isupper():
+        raise ValidationError(
+            "Textul trebuie sa inceapa cu litera mare.",
+            code='fara_majuscula_initiala'
+        )
+
+class FigurinaModelForm(forms.ModelForm):
+    
+    pret_achizitie = forms.DecimalField(
+        label="Pret de Achizitie (RON)",
+        required=True,
+        decimal_places=2,
+        max_digits=10,
+        help_text="Pretul de baza al produsului de la furnizor."
+    )
+    
+    procentaj_adaos = forms.IntegerField(
+        label="Procentaj Adaos Comercial (%)",
+        required=True,
+        validators=[MinValueValidator(0)],
+        help_text="Procentaj de adaos comercial (ex: 30 pentru 30%)."
+    )
+    
+    stoc_disponibil = forms.IntegerField(
+        label="Stoc Disponibil",
+        required=True,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'placeholder': 'Cantitate...'}),
+        help_text="Numarul de bucati disponibile initial."
+    )
+    
+    nume_figurina = forms.CharField(
+        label="Numele Figurinei",
+        max_length=100,
+        validators=[validate_incepe_cu_majuscula, validate_fara_linkuri]
+    )
+
+    descriere = forms.CharField(
+        label="Descriere Produs",
+        widget=forms.Textarea(attrs={'rows': 4}),
+        required=False,
+        validators=[validate_fara_linkuri]
+    )
+
+
+    class Meta:
+        model = Figurina
+        
+        fields = [
+            'nume_figurina',
+            'descriere',
+            'imagine',
+            'greutate',
+            'stoc_disponibil',
+            'data_lansare',
+            'tara_origine',
+            'stare',
+            'id_categorie',
+            'id_producator',
+            'id_serie',
+            'materiale',
+            'seturi_accesorii',
+        ]
+        
+        exclude = ['stare', 'data_lansare'] 
+        
+        labels = {
+            'stoc_disponibil': 'Cantitate Stoc Initial',
+            'nume_figurina': 'Numele Figurinei',
+        }
+        
+        help_texts = {
+            'greutate': 'Specificati greutatea in Kilograme (ex: 1.25).',
+        }
+        
+        widgets = {
+            'data_lansare': forms.DateInput(attrs={'type': 'date'}),
+            'materiale': forms.CheckboxSelectMultiple,
+            'seturi_accesorii': forms.CheckboxSelectMultiple,
+        }
+
+    
+    def clean_procentaj_adaos(self):
+        adaos = self.cleaned_data.get('procentaj_adaos')
+        if adaos is not None and adaos < 0:
+            raise ValidationError(
+                "Procentajul de adaos nu poate fi un numar negativ.",
+                code='adaos_negativ'
+            )
+        return adaos
+
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        stoc = cleaned_data.get('stoc_disponibil')
+        pret_achizitie = cleaned_data.get('pret_achizitie')
+
+        if stoc is not None and pret_achizitie is not None:
+            if stoc == 0 and pret_achizitie > 0:
+                raise ValidationError(
+                    "Eroare: Nu puteti seta un pret de achizitie pentru un produs adaugat cu stoc zero.",
+                    code='pret_fara_stoc'
+                )
+        
+        return cleaned_data
+    
+    
+    
+    
     
     
 def validate_name_format(value):
     if not value[0].isupper():
         raise ValidationError(
-            "Textul trebuie să înceapă cu literă mare.",
+            "Textul trebuie sa inceapa cu litera mare.",
             code='nu_incepe_cu_majuscula'
         )
     if not re.match(r'^[A-Za-z -]+$', value):
         raise ValidationError(
-            "Textul poate conține doar litere, spații și cratimă.",
+            "Textul poate contine doar litere, spatii si cratima.",
             code='caractere_nepermise'
         )
 
 def validate_capitalization_after_separator(value):
     if re.search(r'[ -][a-z]', value):
         raise ValidationError(
-            "După spațiu sau cratimă trebuie să urmeze o literă mare.",
+            "Dupa spatiu sau cratima trebuie sa urmeze o litera mare.",
             code='litera_mica_dupa_separator'
         )
 
 def validate_no_links(value):
     if re.search(r'https?:\/\/', value.lower()):
         raise ValidationError(
-            "Câmpul nu poate conține link-uri (http:// sau https://).",
+            "Campul nu poate contine link-uri (http:// sau https://).",
             code='link_detectat'
         )
 
@@ -208,7 +327,7 @@ def validate_word_count_5_to_100(value):
     count = len(words)
     if not (5 <= count <= 100):
         raise ValidationError(
-            f"Mesajul trebuie să conțină între 5 și 100 de cuvinte. (Ați scris {count})",
+            f"Mesajul trebuie sa contina intre 5 si 100 de cuvinte. (Ati scris {count})",
             code='numar_cuvinte_invalid'
         )
 
@@ -218,32 +337,26 @@ def validate_max_word_length_15(value):
     if long_words:
         examples = ", ".join(long_words[:3])
         raise ValidationError(
-            f"Următoarele cuvinte sunt prea lungi (max 15 caractere): {examples}...",
+            f"Urmatoarele cuvinte sunt prea lungi (max 15 caractere): {examples}...",
             code='cuvant_prea_lung'
         )
 
 def validate_is_major(value_date):
-    """
-    Verifică dacă data nașterii corespunde unei vârste de minim 18 ani.
-    """
     today = datetime.date.today()
     eighteen_years_ago = today.replace(year=today.year - 18)
     
     if value_date > eighteen_years_ago:
         raise ValidationError(
-            "Trebuie să fiți major (18 ani împliniți) pentru a trimite un mesaj.",
+            "Trebuie sa fiti major (18 ani impliniti) pentru a trimite un mesaj.",
             code='minor'
         )
 
 def validate_not_temp_email(value):
-    """
-    Verifică dacă domeniul email-ului NU este unul temporar cunoscut.
-    """
     try:
         domain = value.split('@')[-1].lower()
         if domain in ['guerillamail.com', 'yopmail.com']:
             raise ValidationError(
-                "Acest domeniu de e-mail temporar nu este permis. Vă rugăm folosiți o adresă de e-mail validă.",
+                "Acest domeniu de e-mail temporar nu este permis. Va rugam folositi o adresa de e-mail valida.",
                 code='email_temporar'
             )
     except (IndexError, AttributeError):
@@ -252,8 +365,8 @@ def validate_not_temp_email(value):
 class ContactForm(forms.Form):
     TIP_MESAJ_CHOICES = [
         ('neselectat', '--- Neselectat ---'),
-        ('reclamatie', 'Reclamație'),
-        ('intrebare', 'Întrebare'),
+        ('reclamatie', 'Reclamatie'),
+        ('intrebare', 'Intrebare'),
         ('review', 'Review'),
         ('cerere', 'Cerere'),
         ('programare', 'Programare'),
@@ -277,11 +390,11 @@ class ContactForm(forms.Form):
         min_length=13,
         max_length=13,
         required=False,
-        help_text="Opțional. Trebuie să conțină exact 13 cifre."
+        help_text="Optional. Trebuie sa contina exact 13 cifre."
     )
     
     data_nasterii = forms.DateField(
-        label="Data Nașterii",
+        label="Data Nasterii",
         required=True,
         widget=forms.DateInput(attrs={'type': 'date'}),
         validators=[validate_is_major]
@@ -318,14 +431,14 @@ class ContactForm(forms.Form):
         "iar pentru cereri/intrebari de la 2 incolo. Maximul e 30."
     )
     minim_zile_asteptare = forms.IntegerField(
-        label="Minim zile așteptare",
+        label="Minim zile asteptare",
         required=True,
         help_text=zile_asteptare_help_text,
         validators=[MinValueValidator(0), MaxValueValidator(30)]
     )
     
     mesaj = forms.CharField(
-        label="Mesajul dumneavoastră (vă rugăm să vă și semnați)",
+        label="Mesajul dumneavoastra (va rugam sa va si semnati)",
         required=True,
         widget=forms.Textarea(attrs={'rows': 6}),
         validators=[
@@ -352,10 +465,10 @@ class ContactForm(forms.Form):
             return cnp
             
         if not cnp.isdigit() or len(cnp) != 13:
-            raise ValidationError("CNP-ul trebuie să conțină exact 13 cifre.", code='cnp_invalid_format')
+            raise ValidationError("CNP-ul trebuie sa contina exact 13 cifre.", code='cnp_invalid_format')
         
         if cnp[0] not in ('1', '2'):
-            raise ValidationError("CNP-ul trebuie să înceapă cu cifra 1 sau 2.", code='cnp_s_invalid')
+            raise ValidationError("CNP-ul trebuie sa inceapa cu cifra 1 sau 2.", code='cnp_s_invalid')
         
         try:
             an = int("19" + cnp[1:3])
@@ -363,14 +476,14 @@ class ContactForm(forms.Form):
             zi = int(cnp[5:7])
             datetime.date(an, luna, zi)
         except ValueError:
-            raise ValidationError("Data din CNP (cifrele 2-7) nu este o dată validă.", code='cnp_data_invalida')
+            raise ValidationError("Data din CNP (cifrele 2-7) nu este o data valida.", code='cnp_data_invalida')
         
         return cnp
 
     def clean_tip_mesaj(self):
         tip = self.cleaned_data.get('tip_mesaj')
         if tip == 'neselectat':
-            raise ValidationError("Vă rugăm să selectați un tip de mesaj valid.", code='tip_neselectat')
+            raise ValidationError("Va rugam sa selectati un tip de mesaj valid.", code='tip_neselectat')
         return tip
 
 
@@ -392,18 +505,17 @@ class ContactForm(forms.Form):
         if tip_mesaj and zile_asteptare is not None:
             if tip_mesaj in ('review', 'cerere') and zile_asteptare < 4:
                 self.add_error('minim_zile_asteptare', 
-                                "Pentru Review-uri/Cereri, minimul de zile de așteptare este 4.")
+                                "Pentru Review-uri/Cereri, minimul de zile de asteptare este 4.")
             
             elif tip_mesaj == 'intrebare' and zile_asteptare < 2:
                 self.add_error('minim_zile_asteptare', 
-                                "Pentru Întrebări, minimul de zile de așteptare este 2.")
-
+                                "Pentru Intrebari, minimul de zile de asteptare este 2.")
         if nume and mesaj:
             if 'nume' not in self.errors and 'mesaj' not in self.errors:
                 words = re.findall(r'\w+', mesaj)
                 if not words or words[-1] != nume:
                     self.add_error('mesaj', 
-                                    f"Mesajul trebuie să se încheie cu numele dumneavoastră ('{nume}') ca semnătură.")
+                                    f"Mesajul trebuie sa se incheie cu numele dumneavoastra ('{nume}') ca semnatura.")
         
         if cnp and data_nasterii:
             if 'cnp' not in self.errors and 'data_nasterii' not in self.errors:
@@ -458,6 +570,9 @@ class CustomUserCreationForm(UserCreationForm):
             raise ValidationError("Va rugam sa introduceti un oras valid.", code='oras_nespecificat')
         return oras
     
+    
+    
+
 class CustomLoginForm(AuthenticationForm):
     remember_me = forms.BooleanField(
         label="Tine-ma minte (o zi)",
@@ -499,107 +614,3 @@ class FigurinaModelForm(forms.ModelForm):
         }
         
         
-def validate_fara_linkuri(value):
-    if re.search(r'https?:\/\/', str(value).lower()):
-        raise ValidationError(
-            "Acest câmp nu poate conține link-uri (http:// sau https://).",
-            code='link_interzis'
-        )
-
-def validate_incepe_cu_majuscula(value):
-    if not str(value)[0].isupper():
-        raise ValidationError(
-            "Textul trebuie să înceapă cu literă mare.",
-            code='fara_majuscula_initiala'
-        )
-
-class FigurinaModelForm(forms.ModelForm):
-    
-    pret_achizitie = forms.DecimalField(
-        label="Preț de Achiziție (RON)",
-        required=True,
-        decimal_places=2,
-        max_digits=10,
-        help_text="Prețul de bază al produsului de la furnizor."
-    )
-    
-    procentaj_adaos = forms.IntegerField(
-        label="Procentaj Adaos Comercial (%)",
-        required=True,
-        validators=[MinValueValidator(0)],
-        help_text="Procentaj de adaos comercial (ex: 30 pentru 30%)."
-    )
-    
-    nume_figurina = forms.CharField(
-        label="Numele Figurinei",
-        max_length=100,
-        validators=[validate_incepe_cu_majuscula, validate_fara_linkuri]
-    )
-
-    descriere = forms.CharField(
-        label="Descriere Produs",
-        widget=forms.Textarea(attrs={'rows': 4}),
-        required=False,
-        validators=[validate_fara_linkuri]
-    )
-
-
-    class Meta:
-        model = Figurina
-        
-        fields = [
-            'nume_figurina',
-            'descriere',
-            'imagine',
-            'greutate',
-            'stoc_disponibil',
-            'data_lansare',
-            'tara_origine',
-            'stare',
-            'id_categorie',
-            'id_producator',
-            'id_serie',
-            'materiale',
-            'seturi_accesorii',
-        ]
-        
-        exclude = ['pret', 'data_adaugare'] 
-        
-        labels = {
-            'stoc_disponibil': 'Cantitate Stoc Inițial',
-        }
-        
-        help_texts = {
-            'greutate': 'Specificați greutatea în Kilograme (ex: 1.25).',
-        }
-        
-        widgets = {
-            'data_lansare': forms.DateInput(attrs={'type': 'date'}),
-            'materiale': forms.CheckboxSelectMultiple,
-            'seturi_accesorii': forms.CheckboxSelectMultiple,
-        }
-
-    
-    def clean_procentaj_adaos(self):
-        adaos = self.cleaned_data.get('procentaj_adaos')
-        if adaos is not None and adaos < 0:
-            raise ValidationError(
-                "Procentajul de adaos nu poate fi un număr negativ.",
-                code='adaos_negativ'
-            )
-        return adaos
-
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        stoc = cleaned_data.get('stoc_disponibil')
-        pret_achizitie = cleaned_data.get('pret_achizitie')
-
-        if stoc is not None and pret_achizitie is not None:
-            if stoc == 0 and pret_achizitie > 0:
-                raise ValidationError(
-                    "Eroare: Nu puteți seta un preț de achiziție pentru un produs adăugat cu stoc zero.",
-                    code='pret_fara_stoc'
-                )
-        
-        return cleaned_data

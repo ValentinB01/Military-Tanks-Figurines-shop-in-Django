@@ -18,7 +18,8 @@ def populate_tancuri():
         {'nume_categorie': 'Tancuri Americane', 'descriere': 'Modele de tancuri din Statele Unite', 'activa': True},
         {'nume_categorie': 'Tancuri Germane', 'descriere': 'Modele de tancuri germane', 'activa': True},
         {'nume_categorie': 'Tancuri Rusești', 'descriere': 'Modele de tancuri sovietice si rusesti', 'activa': True},
-        {'nume_categorie': 'Tancuri Britanice', 'descriere': 'Modele de tancuri britanice', 'activa': True}
+        {'nume_categorie': 'Tancuri Britanice', 'descriere': 'Modele de tancuri britanice', 'activa': True},
+        {'nume_categorie': 'Tancuri Franceze', 'descriere': 'Modele de tancuri franceze', 'activa': True},
     ]
     
     for cat_data in categorii:
@@ -29,7 +30,8 @@ def populate_tancuri():
         {'nume_producator': 'Tamiya', 'tara_origine': 'Japonia', 'email': 'contact@tamiya.com', 'activ': True},
         {'nume_producator': 'Revell', 'tara_origine': 'Germania', 'email': 'info@revell.de', 'activ': True},
         {'nume_producator': 'Italeri', 'tara_origine': 'Italia', 'email': None, 'activ': True},
-        {'nume_producator': 'Dragon Models', 'tara_origine': 'Hong Kong', 'telefon': None, 'activ': True}
+        {'nume_producator': 'Dragon Models', 'tara_origine': 'Hong Kong', 'telefon': None, 'activ': True},
+        {'nume_producator': 'Emag', 'tara_origine': 'Romania', 'email': 'contact@emag.com', 'activ': True},
     ]
     
     for prod_data in producatori:

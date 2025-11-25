@@ -106,7 +106,7 @@ def log_view(request):
             
             if not table_columns:
                 table_columns = all_valid_model_columns
-
+                
     table_data = logs_by_id if logs_by_id else logs
     
     
@@ -194,7 +194,7 @@ def cos_virtual(request):
 def produse(request):
     figurine_list = Figurina.objects.select_related(
         'id_categorie', 'id_producator', 'id_serie'
-    ).prefetch_related('materiale').all()
+    ).prefetch_related('materiale', 'seturi_accesorii').all()
 
     params_get = request.GET.copy()
     form = FigurinaFiltruForm(request.GET)
@@ -256,7 +256,7 @@ def produse(request):
             materiale_query = request.GET.getlist('materiale')
             if materiale_query:
                 figurine_list = figurine_list.filter(materiale__in=materiale_query).distinct() 
-
+            
             per_pagina_val = form.cleaned_data.get('per_pagina')
             if per_pagina_val:
                 try:
@@ -268,13 +268,17 @@ def produse(request):
                     elemente_pe_pagina = 5 
                     
             sort_by = request.GET.get('ordonare')
+            
+            sort_by_link = None 
+
             if not sort_by:
                 sort_by_link = request.GET.get('sort')
+            
             if sort_by_link == 'a':
                 sort_by = 'pret'
             elif sort_by_link == 'd':
                 sort_by = '-pret'
-            else:
+            elif not sort_by: 
                 sort_by = 'nume_figurina'
         else:
             figurine_list = Figurina.objects.none()
@@ -305,9 +309,11 @@ def produse(request):
         'params_pagination': params_for_pagination.urlencode(),
         'params_sorting': params_for_sorting.urlencode(),
         'ip_address': get_ip_address(request),
-        'form': form
+        'form': form,
+        'repaginare_warning': repaginare_warning
     }
     return render(request, 'produse.html', context)
+
 
 def produs_detaliu(request, id_figurina):
     figurina = get_object_or_404(Figurina, id_figurina=id_figurina)
@@ -318,17 +324,13 @@ def produs_detaliu(request, id_figurina):
     return render(request, 'produs_detaliu.html', context)
 
 def categorie_detaliu(request, nume_categorie):
-    # 1. Obtinem categoria principala
     categorie = get_object_or_404(Categorie, nume_categorie=nume_categorie)
-    
-    # 2. Setam queryset-ul de baza sa contina DOAR produse din aceasta categorie
     figurine_list = Figurina.objects.filter(id_categorie=categorie).select_related(
         'id_categorie', 'id_producator', 'id_serie'
     ).prefetch_related('materiale')
     
     params_get = request.GET.copy()
     
-    # 3. Instantiem formularul, TRIMITANDU-I CATEGORIA PRESELECTATA
     form = FigurinaFiltruForm(request.GET, categorie_preselectata=categorie)
     
     elemente_pe_pagina = 5
@@ -337,31 +339,31 @@ def categorie_detaliu(request, nume_categorie):
 
     if request.GET:
         if form.is_valid():
-            # APLICAM RESTUL FILTRELOR (logica e copiata din view-ul 'produse')
             
-            # Nume
             nume_query = form.cleaned_data.get('nume_figurina')
             if nume_query:
                 figurine_list = figurine_list.filter(nume_figurina__icontains=nume_query)
-
-            # Pret
             pret_min_query = form.cleaned_data.get('pret_min')
             if pret_min_query is not None:
                 figurine_list = figurine_list.filter(pret__gte=pret_min_query)
             pret_max_query = form.cleaned_data.get('pret_max')
             if pret_max_query is not None:
                 figurine_list = figurine_list.filter(pret__lte=pret_max_query)
-
-            # (Adauga aici si filtrele de Greutate si Data Lansarii daca le-ai adaugat)
-            # ...
-
-            # Filtre cu selectie multipla
-            # ** Filtrul de categorie se va auto-aplica datorita campului hidden **
-            # dar il lasam explicit pentru robustete
+            greutate_min_query = form.cleaned_data.get('greutate_min')
+            if greutate_min_query is not None:
+                figurine_list = figurine_list.filter(greutate__gte=greutate_min_query)  
+            greutate_max_query = form.cleaned_data.get('greutate_max')
+            if greutate_max_query is not None:
+                figurine_list = figurine_list.filter(greutate__lte=greutate_max_query)
+            data_min_query = form.cleaned_data.get('data_lansare_min')
+            if data_min_query:
+                figurine_list = figurine_list.filter(data_lansare__gte=data_min_query)
+            data_max_query = form.cleaned_data.get('data_lansare_max')
+            if data_max_query:
+                figurine_list = figurine_list.filter(data_lansare__lte=data_max_query)
             categorie_query = form.cleaned_data.get('id_categorie')
             if categorie_query:
                 figurine_list = figurine_list.filter(id_categorie__in=categorie_query)
-            
             stare_query = form.cleaned_data.get('stare')
             if stare_query:
                 figurine_list = figurine_list.filter(stare__in=stare_query)
@@ -382,7 +384,6 @@ def categorie_detaliu(request, nume_categorie):
             if materiale_query:
                 figurine_list = figurine_list.filter(materiale__in=materiale_query).distinct() 
 
-            # Logica Paginare
             per_pagina_val = form.cleaned_data.get('per_pagina')
             if per_pagina_val:
                 try:
@@ -392,16 +393,19 @@ def categorie_detaliu(request, nume_categorie):
                 except (ValueError, TypeError):
                     elemente_pe_pagina = 5
             
-            # Logica Sortare
-            sort_by = form.cleaned_data.get('ordonare')
+            sort_by = request.GET.get('ordonare')
+            
+            sort_by_link = None 
+
             if not sort_by:
                 sort_by_link = request.GET.get('sort')
-                if sort_by_link == 'a':
-                    sort_by = 'pret'
-                elif sort_by_link == 'd':
-                    sort_by = '-pret'
-                else:
-                    sort_by = 'nume_figurina'
+            
+            if sort_by_link == 'a':
+                sort_by = 'pret'
+            elif sort_by_link == 'd':
+                sort_by = '-pret'
+            elif not sort_by: 
+                sort_by = 'nume_figurina'
             
             figurine_list = figurine_list.order_by(sort_by)
 
@@ -416,7 +420,6 @@ def categorie_detaliu(request, nume_categorie):
     else:
         figurine_list = figurine_list.order_by('nume_figurina')
     
-    # Paginare
     paginator = Paginator(figurine_list, elemente_pe_pagina)
     page_obj = paginator.get_page(page_number_str)
     
@@ -429,8 +432,8 @@ def categorie_detaliu(request, nume_categorie):
         del params_for_sorting['sort']
 
     context = {
-        'cat': categorie, # Trimitem categoria la template
-        'page_obj': page_obj, # Trimitem pagina paginata
+        'cat': categorie,
+        'page_obj': page_obj,
         'form': form,
         'params_pagination': params_for_pagination.urlencode(),
         'params_sorting': params_for_sorting.urlencode(),
@@ -438,6 +441,43 @@ def categorie_detaliu(request, nume_categorie):
         'repaginare_warning': repaginare_warning
     }
     return render(request, 'categorie_detaliu.html', context)
+
+
+
+def adauga_produs(request):
+    if request.method == 'POST':
+        form = FigurinaModelForm(request.POST, request.FILES)
+        
+        if form.is_valid():
+            
+            figurina = form.save(commit=False)
+            
+            pret_ach = form.cleaned_data['pret_achizitie']
+            adaos = form.cleaned_data['procentaj_adaos']
+            stoc = form.cleaned_data['stoc_disponibil']
+            
+            figurina.pret = pret_ach * (1 + (adaos / 100))
+            figurina.stoc_disponibil = stoc
+            
+            figurina.save()
+            
+            form.save_m2m()
+            
+            
+            messages.success(request, f"Produsul '{figurina.nume_figurina}' a fost adăugat cu succes!")
+            return redirect('produse') 
+    
+    else:
+        form = FigurinaModelForm()
+
+    context = {
+        'form': form,
+        'ip_address': get_ip_address(request)
+    }
+    return render(request, 'adauga_produs.html', context)
+
+
+
 
 def serie_list(request):
     serii_list = Seria.objects.filter(disponibilitate=True).order_by('nume_serie')
@@ -462,23 +502,14 @@ def serie_detaliu(request, id_serie):
     }
     return render(request, 'serie_detaliu.html', context)
 
+
 def _capitalize_sentence_starts(text):
-    """
-    Capitalizează litera de după un terminator de propoziție
-    luând în considerare și spațiile.
-    """
-    # Funcție internă pentru re.sub
     def capitalize_match(match):
-        # match.group(1) = terminatorul (ex: '.')
-        # match.group(2) = spațiile (ex: '  ')
-        # match.group(3) = litera (ex: 'a')
         return match.group(1) + match.group(2) + match.group(3).upper()
 
-    # Întâi procesăm "..." ca să nu fie prins de "." simplu
     pattern_ellipsis = r'(\.\.\.)(\s*)(\w)'
     text = re.sub(pattern_ellipsis, capitalize_match, text)
     
-    # Procesăm restul terminatorilor
     pattern_single = r'([.?!])(\s*)(\w)'
     text = re.sub(pattern_single, capitalize_match, text)
     return text
@@ -489,26 +520,19 @@ def contact(request):
         
         if form.is_valid():
             cd = form.cleaned_data
-            
-            # === START PRE-PROCESARE (de la pasul anterior) ===
-
-            # 1. Calcul Vârstă
             today = datetime.date.today()
             data_nasterii = cd.get('data_nasterii')
             varsta_ani = today.year - data_nasterii.year - ((today.month, today.day) < (data_nasterii.month, data_nasterii.day))
             varsta_luni = (today.month - data_nasterii.month - (today.day < data_nasterii.day)) % 12
             
-            # Adăugăm noua valoare în dicționar
             cd['varsta_calculata'] = f"{varsta_ani} ani și {varsta_luni} luni"
 
-            # 2. Formatare Mesaj (Whitespace și Capitalizare)
             mesaj_original = cd.get('mesaj')
             mesaj_procesat = mesaj_original.replace('\n', ' ')
             mesaj_procesat = re.sub(r'\s+', ' ', mesaj_procesat).strip()
             mesaj_procesat = _capitalize_sentence_starts(mesaj_procesat)
             cd['mesaj_procesat'] = mesaj_procesat
             
-            # 3. Setare flag "urgent"
             tip_mesaj = cd.get('tip_mesaj')
             zile_asteptare = cd.get('minim_zile_asteptare')
             is_urgent = False
@@ -521,59 +545,41 @@ def contact(request):
                 is_urgent = True
                 
             cd['urgent'] = is_urgent
-
-            # === SFÂRȘIT PRE-PROCESARE ===
-
-            # === START LOGICĂ NOUĂ: SALVARE ÎN JSON ===
-
-            # 1. Pregătirea datelor pentru JSON
+            
             data_to_save = cd.copy()
             
-            # Eliminăm câmpul de confirmare
             data_to_save.pop('confirmare_email', None)
             
-            # Adăugăm datele suplimentare
             data_to_save['ip_address'] = get_ip_address(request)
             data_to_save['timestamp_sosire'] = datetime.datetime.now().isoformat()
             
-            # Convertim obiectul Date în string (JSON nu știe de obiecte Python Date)
             if 'data_nasterii' in data_to_save and isinstance(data_to_save['data_nasterii'], datetime.date):
                 data_to_save['data_nasterii'] = data_to_save['data_nasterii'].isoformat()
 
-            # 2. Crearea numelui fișierului
             timestamp = int(time.time())
             file_name = f"mesaj_{timestamp}"
             if cd.get('urgent'):
                 file_name += "_urgent"
             file_name += ".json"
 
-            # 3. Definirea căii și salvarea fișierului
-            # Calea este: [folderul_proiectului]/proiectapp/Mesaje/
             MESAJE_DIR = os.path.join(settings.BASE_DIR, 'proiectapp', 'Mesaje')
             file_path = os.path.join(MESAJE_DIR, file_name)
 
             try:
-                # Ne asigurăm că directorul există (deși l-am creat la Pasul 1)
                 os.makedirs(MESAJE_DIR, exist_ok=True)
                 
-                # Scriem fișierul JSON
                 with open(file_path, 'w', encoding='utf-8') as f:
                     json.dump(data_to_save, f, ensure_ascii=False, indent=4)
                 
-                # Afișăm în consolă (ca la pasul anterior)
-                print(f"--- MESAJ SALVAT ÎN {file_name} ---")
+                print(f"Mesaj salvat in {file_name}")
                 print(json.dumps(data_to_save, indent=2, ensure_ascii=False))
-                print("-----------------------------------")
 
-                # Mesaj de succes și redirectare
-                messages.success(request, 'Mesajul dumneavoastră a fost trimis și salvat cu succes!')
+                messages.success(request, 'Mesajul dumneavoastra a fost trimis si salvat cu succes!')
                 return redirect('contact')
 
             except Exception as e:
-                print(f"!!! EROARE CRITICĂ la salvarea mesajului JSON: {e}")
-                form.add_error(None, f"Eroare internă la salvarea mesajului. Vă rugăm încercați din nou. ({e})")
-
-    
+                print(f"Eroare la salvarea mesajului JSON: {e}")
+                form.add_error(None, f"Eroare interna la salvarea mesajului. Va rugam incercati din nou. ({e})")
     else:
         form = ContactForm()
 
@@ -584,35 +590,6 @@ def contact(request):
     return render(request, 'contact.html', context)
 
 
-def adauga_produs(request):
-    if request.method == 'POST':
-        form = FigurinaModelForm(request.POST, request.FILES)
-        
-        if form.is_valid():
-            
-            figurina = form.save(commit=False)
-            
-            pret_ach = form.cleaned_data['pret_achizitie']
-            adaos = form.cleaned_data['procentaj_adaos']
-            
-            figurina.pret = pret_ach * (1 + (adaos / 100))
-            
-            figurina.save()
-            
-            form.save_m2m()
-            
-            
-            messages.success(request, f"Produsul '{figurina.nume_figurina}' a fost adăugat cu succes!")
-            return redirect('produse') 
-    
-    else:
-        form = FigurinaModelForm()
-
-    context = {
-        'form': form,
-        'ip_address': get_ip_address(request)
-    }
-    return render(request, 'adauga_produs.html', context)
 
 
 
