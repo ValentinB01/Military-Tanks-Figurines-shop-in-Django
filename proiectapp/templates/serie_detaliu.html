@@ -2,34 +2,6 @@
 {% load static %}
 
 {% block content %}
-{% comment %} <section id="serie-detaliu">
-    <h2>Serie: {{ serie.nume_serie }} ({{ serie.scala }})</h2>
-    <p>An lansare: {{ serie.an_lansare }}</p>
-    <p>{{ serie.descriere|default:"Fără descriere." }}</p>
-    
-    <hr style="margin: 2rem 0;">
-    
-    <h3>Produse din aceasta serie:</h3>
-    
-    <div class="lista-produse">
-        {% for p in produse %}
-            <article class="produs-card" style="text-align: center;">
-                <h3><a href="{% url 'produs_detaliu' p.id_figurina %}">{{ p.nume_figurina }}</a></h3>
-                
-                {% if p.imagine %}
-                    <a href="{% url 'produs_detaliu' p.id_figurina %}">
-                        <img src="{{ p.imagine.url }}" alt="{{ p.nume_figurina }}" style="max-width: 150px; height: auto; border-radius: 5px;">
-                    </a>
-                {% endif %}
-                
-                <p>Preț: {{ p.pret }} RON</p>
-            </article>
-        {% empty %}
-            <p>Nu exista produse în aceasta serie.</p>
-        {% endfor %}
-    </div>
-    
-</section> {% endcomment %}
 <section class="page-title-section">
     <h1>Serie: {{ serie.nume_serie }} ({{ serie.scala }})</h1>
     <p style="color: #6c757d; font-size: 1.1rem;">
@@ -76,7 +48,7 @@
         </article>
         {% empty %}
             <p style="text-align: center; grid-column: 1 / -1; font-size: 1.1rem; color: #6c757d;">
-                Nu există (încă) produse listate în această serie.
+                Nu există (inca) produse listate în aceasta serie.
             </p>
         {% endfor %}
     </div>

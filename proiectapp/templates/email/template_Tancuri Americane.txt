@@ -1,0 +1,13 @@
+Hello {nume_client},
+
+Salutare fan al fortei blindate americane!
+Vrem să te anuntam despre reducerile la modelele Abrams, Sherman și altele din categoria SUA.
+
+Subiectul ofertei: {subiect}
+
+Grabeste-te! Oferta expira la: {data_expirare}.
+
+Notad de la comandament: 
+{mesaj}
+
+{alte_date}

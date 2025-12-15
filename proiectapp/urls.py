@@ -1,13 +1,36 @@
 from django.urls import path
 from django.contrib import admin
 from . import views
+from django.contrib.sitemaps.views import sitemap
+from django.contrib.sitemaps import GenericSitemap
+from .sitemaps import StaticViewSitemap
+from .models import Figurina, Seria, Categorie
+
+figurina_info = {
+    'queryset': Figurina.objects.all(),
+    'date_field': 'data_adaugare',
+}
+
+seria_info = {
+    'queryset': Seria.objects.filter(disponibilitate=True)
+}
+
+categorie_info = {
+    'queryset': Categorie.objects.filter(activa=True)
+}
+
+sitemaps = {
+    'static': StaticViewSitemap,
+    'figurine': GenericSitemap(figurina_info, priority=0.6),
+    'serii': GenericSitemap(seria_info, priority=0.5),
+    'categorii': GenericSitemap(categorie_info, priority=0.5),
+}
 
 urlpatterns = [
     path('', views.index, name='index'),
     path('despre/', views.despre, name='despre'),
     path('produse/', views.produse, name='produse'),
     path('contact/', views.contact, name='contact'),
-    path('cos_virtual/', views.cos_virtual, name='cos_virtual'),    
     path('log/', views.log_view, name='log'),
     path('info/', views.info_view, name='info'),
     path('produse/<int:id_figurina>/', views.produs_detaliu, name='produs_detaliu'),
@@ -28,4 +51,7 @@ urlpatterns = [
     path('interzis/', views.view_403, name='interzis'),
     path('accesare-oferta/', views.accesare_oferta, name='accesare_oferta'),
     path('oferta/', views.oferta_view, name='oferta'),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('cos/', views.cos_virtual, name='cos_virtual'),
+    path('finalizeaza_comanda/', views.finalizeaza_comanda, name='finalizeaza_comanda'),
 ]

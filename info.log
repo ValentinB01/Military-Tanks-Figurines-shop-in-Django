@@ -8,3 +8,22 @@ INFO 2025-11-25 22:22:57,386 views Accesare pagina index
 INFO 2025-11-25 22:23:19,061 views Accesare pagina index
 INFO 2025-11-25 22:23:19,677 views Accesare pagina index
 INFO 2025-11-25 22:25:23,332 views Accesare pagina index
+INFO 2025-11-27 12:50:42,903 views INFO: Utilizatorul test1 s-a logat cu succes.
+CRITICAL 2025-11-27 13:09:34,267 forms CRITICAL: Tentativa de inregistrare cu username interzis 'ADMIN'!
+CRITICAL 2025-11-27 13:10:31,621 forms CRITICAL: Tentativa de inregistrare cu username interzis 'ADMIN'!
+INFO 2025-12-03 00:28:01,444 cron INFO: S-a sters automat utilizatorul neconfirmat: Valentin (Email: valentinechristain540@gmail.com)
+INFO 2025-12-03 00:28:01,468 cron INFO: S-a sters automat utilizatorul neconfirmat: valentin (Email: valentinechristain540@gmail.com)
+INFO 2025-12-03 00:28:01,487 cron INFO: S-a sters automat utilizatorul neconfirmat: admin (Email: valentin.cristiannn@gmail.com)
+WARNING 2025-12-03 00:30:01,984 cron WARNING: Task de mentenanta. S-au sters 301 intrari vechi din AccessLog.
+WARNING 2025-12-03 20:30:01,845 cron WARNING: Task de mentenanta. S-au sters 13 intrari vechi din AccessLog.
+INFO 2025-12-03 21:50:02,412 cron INFO: S-a sters automat utilizatorul neconfirmat: admin (Email: )
+WARNING 2025-12-03 23:30:02,263 cron WARNING: Task de mentenanta. S-au sters 6 intrari vechi din AccessLog.
+WARNING 2025-12-04 00:00:01,865 cron WARNING: Task de mentenanta. S-au sters 29 intrari vechi din AccessLog.
+INFO 2025-12-04 12:44:01,479 cron INFO: S-a sters automat utilizatorul neconfirmat: Vasile (Email: vasilescu@yahoo.com)
+WARNING 2025-12-04 13:00:01,962 cron WARNING: Task de mentenanta. S-au sters 8 intrari vechi din AccessLog.
+WARNING 2025-12-04 13:30:01,626 cron WARNING: Task de mentenanta. S-au sters 18 intrari vechi din AccessLog.
+INFO 2025-12-04 18:06:09,035 cron INFO: Raportul de stoc critic a fost trimis administratorilor.
+WARNING 2025-12-05 00:29:08,933 views WARNING: Stoc critic pentru produsul M4A3E8 Shermann (ID: 15)
+INFO 2025-12-05 00:30:32,902 views INFO: Utilizatorul test1 s-a logat cu succes.
+WARNING 2025-12-16 00:00:02,747 cron WARNING: Task de mentenanta. S-au sters 122 intrari vechi din AccessLog.
+INFO 2025-12-16 00:11:32,820 views INFO: Utilizatorul test1 s-a logat cu succes.

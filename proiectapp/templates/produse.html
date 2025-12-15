@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+
 <section id="produse-lista">
     <h2>Produsele Noastre</h2>
     
@@ -9,7 +10,8 @@
         <input type="hidden" name="page" value="{{ page_obj.number }}">
 
         {% if form.non_field_errors %}
-            {% endif %}
+            <div class="error">{{ form.non_field_errors }}</div>
+        {% endif %}
         
         <div class="form-group">
             <label for="{{ form.nume_figurina.id_for_label }}">{{ form.nume_figurina.label }}</label>
@@ -19,13 +21,11 @@
         <div class="form-group">
             <label for="{{ form.ordonare.id_for_label }}">{{ form.ordonare.label }}</label>
             {{ form.ordonare }}
-            {{ form.ordonare.errors }}
         </div>
 
         <div class="form-group">
             <label for="{{ form.per_pagina.id_for_label }}">{{ form.per_pagina.label }}</label>
             {{ form.per_pagina }}
-            {{ form.per_pagina.errors }}
         </div>
 
         <div class="form-group-inline">
@@ -49,7 +49,7 @@
                 {{ form.greutate_max }}
             </div>
         </div>
-
+        
         <div class="form-group-inline">
             <div class="form-group">
                 <label for="{{ form.data_lansare_min.id_for_label }}">{{ form.data_lansare_min.label }}</label>
@@ -63,108 +63,109 @@
 
         <div class="form-group-checkbox">
             <strong>{{ form.stare.label }}</strong>
-            <div class="checkbox-container">
-                {{ form.stare }}
-            </div>
+            <div class="checkbox-container">{{ form.stare }}</div>
         </div>
-        
         <div class="form-group-checkbox">
             <strong>{{ form.tara_origine.label }}</strong>
-            <div class="checkbox-container">
-                {{ form.tara_origine }}
-            </div>
+            <div class="checkbox-container">{{ form.tara_origine }}</div>
         </div>
-
         <div class="form-group-checkbox">
             <strong>{{ form.id_categorie.label }}</strong>
-            <div class="checkbox-container">
-                {{ form.id_categorie }}
-            </div>
+            <div class="checkbox-container">{{ form.id_categorie }}</div>
         </div>
-        
         <div class="form-group-checkbox">
             <strong>{{ form.id_producator.label }}</strong>
-            <div class="checkbox-container">
-                {{ form.id_producator }}
-            </div>
+            <div class="checkbox-container">{{ form.id_producator }}</div>
         </div>
-
         <div class="form-group-checkbox">
             <strong>{{ form.id_serie.label }}</strong>
-            <div class="checkbox-container">
-                {{ form.id_serie }}
-            </div>
+            <div class="checkbox-container">{{ form.id_serie }}</div>
         </div>
-        
         <div class="form-group-checkbox">
             <strong>{{ form.materiale.label }}</strong>
-            <div class="checkbox-container">
-                {{ form.materiale }}
-            </div>
+            <div class="checkbox-container">{{ form.materiale }}</div>
         </div>
 
         <div class="form-buttons">
             <button type="submit" class="btn-filter">Aplica Filtrele</button>
             <a href="{% url 'produse' %}" class="btn-reset" onclick="return confirm('Sunteti sigur ca doriti sa resetezi filtrele?');">Reseteaza Filtrele</a>
+        </div>
     </form>
+    
     <hr class="section-divider">
     
     {% if repaginare_warning %}
         <div class="repaginare-warning">
-            <strong>Nota:</strong> Ati schimbat numarul de produse pe pagina. Este posibil sa fi sarit peste unele produse sau le puteti vedea iar pe cele deja vizualizate.
+            <strong>Nota:</strong> Ati schimbat numarul de produse pe pagina.
         </div>
     {% endif %}
     
     <div class="sortare-container">
         <span>Sorteaza dupa pret:</span>
-        <a href="?sort=a{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
-            class="sort-link {% if request.GET.sort == 'a' %}active{% endif %}">
-            Crescator
-        </a>
-        <a href="?sort=d{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
-            class="sort-link {% if request.GET.sort == 'd' %}active{% endif %}">
-            Descrescator
-        </a>
-        <a href="?{% if params_sorting %}&{{ params_sorting }}{% endif %}" 
-            class="sort-link {% if not request.GET.sort and not request.GET.sort == 'd' %}active{% endif %}">
-            Implicit
-        </a>
+        <a href="?sort=a{% if params_sorting %}&{{ params_sorting }}{% endif %}" class="sort-link {% if request.GET.sort == 'a' %}active{% endif %}">Crescator</a>
+        <a href="?sort=d{% if params_sorting %}&{{ params_sorting }}{% endif %}" class="sort-link {% if request.GET.sort == 'd' %}active{% endif %}">Descrescator</a>
+        <a href="?{% if params_sorting %}&{{ params_sorting }}{% endif %}" class="sort-link {% if not request.GET.sort and not request.GET.sort == 'd' %}active{% endif %}">Implicit</a>
     </div>
     
     <div class="lista-produse">
-        {% for fig in page_obj %}
-        <article class="produs-card">
-            <a href="{% url 'produs_detaliu' fig.id_figurina %}" class="card-image-link">
-                {% if fig.imagine %}
-                    <img src="{{ fig.imagine.url }}" alt="{{ fig.nume_figurina }}">
-                {% else %}
-                    <img src="{% static 'imagini/placeholder.png' %}" alt="Imagine indisponibilă">
-                {% endif %}
-            </a>
-            
-            <div class="card-continut">
-                <p class="card-categorie">
-                    <a href="{% url 'categorie_detaliu' fig.id_categorie.nume_categorie %}"
-                        class="link-categorie" 
-                        style="--culoare-baza: {{ fig.id_categorie.culoare }}; --culoare-activa: {{ fig.id_categorie.culoare_activa }};">
-                        {{ fig.id_categorie.nume_categorie }}
-                    </a>
-                </p>
-                
-                <h3 class="card-titlu">
-                    <a href="{% url 'produs_detaliu' fig.id_figurina %}">{{ fig.nume_figurina }}</a>
-                </h3>
-                
-                <p class="card-stare">{{ fig.get_stare_display }}</p>
-                
-                <div class="card-spacer"></div> 
-                
-                <p class="card-pret">{{ fig.pret }} RON</p>
+    {% for fig in page_obj %}
+    <article class="produs-card">
+        
+        <a href="{% url 'produs_detaliu' fig.id_figurina %}" class="card-image-link">
+            {% if fig.imagine %}
+                <img src="{{ fig.imagine.url }}" alt="{{ fig.nume_figurina }}">
+            {% else %}
+                <div class="text-muted">Fără imagine</div>
+            {% endif %}
+        </a>
+        
+        <div class="card-continut">
+            <div class="card-categorie">
+                {{ fig.id_categorie.nume_categorie }}
             </div>
-        </article>
-        {% empty %}
-        <p>Nu au fost gasite produse care sa corespunda filtrelor selectate.</p>
-        {% endfor %}
+            
+            <h3 class="card-titlu">
+                <a href="{% url 'produs_detaliu' fig.id_figurina %}" class="text-decoration-none text-dark">
+                    {{ fig.nume_figurina }}
+                </a>
+            </h3>
+            
+            <div class="spacer-flex"></div> 
+            
+            <div class="info-pret-stoc">
+                <div class="pret-mare">{{ fig.pret }} RON</div>
+                
+                {% if fig.stoc_disponibil == 0 %}
+                    <span class="badge bg-light text-danger border border-danger">STOC EPUIZAT</span>
+                {% else %}
+                    <span class="badge bg-light text-success border border-success">Stoc: {{ fig.stoc_disponibil }} buc.</span>
+                {% endif %}
+            </div>
+
+            <div class="mt-2">
+                {% if fig.stoc_disponibil > 0 %}
+                    <button class="btn btn-primary w-100 fw-bold py-2 shadow-sm" 
+                            onclick="adaugaInCos(
+                                '{{ fig.id_figurina }}', 
+                                '{{ fig.nume_figurina|escapejs }}', 
+                                '{{ fig.pret }}', 
+                                '{{ fig.stoc_disponibil }}'
+                            )">
+                        <i class="bi bi-cart-plus-fill"></i> Adaugă în coș
+                    </button>
+                {% else %}
+                    <button class="btn btn-secondary w-100 py-2" disabled>
+                        Indisponibil
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <p class="h5 text-muted">Nu au fost găsite produse conform filtrelor selectate.</p>
+    </div>
+    {% endfor %}
     </div>
 
     <div class="paginare">
@@ -185,4 +186,5 @@
         </span>
     </div>
 </section>
+
 {% endblock %}

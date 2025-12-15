@@ -579,10 +579,10 @@ class CustomUserCreationForm(UserCreationForm):
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if username.lower() == 'admin':
-            logger.critical("CRITICAL: Tentativă de înregistrare cu username interzis 'ADMIN'!")
+            logger.critical("CRITICAL: Tentativa de inregistrare cu username interzis 'ADMIN'!")
             email_incercare = self.data.get('email', 'Nespecificat')
             subiect = "cineva incearca sa ne preia site-ul"
-            mesaj_text = f"Tentativă de înregistrare cu user 'admin'. Email folosit: {email_incercare}"
+            mesaj_text = f"Tentativa de inregistrare cu user 'admin'. Email folosit: {email_incercare}"
             mesaj_html = f"""
                 <h1 style="color: red;">{subiect}</h1>
                 <p>{mesaj_text}</p>
@@ -633,23 +633,20 @@ class FigurinaModelForm(forms.ModelForm):
         labels = {
             'nume_figurina': 'Numele Figurinei',
             'id_categorie': 'Categorie',
-            'id_producator': 'Producător',
+            'id_producator': 'Producator',
             'id_serie': 'Serie',
             'stoc_disponibil': 'Stoc',
-            'tara_origine': 'Țara de Origine',
+            'tara_origine': 'Tara de Origine',
         }
-        
         
 class PromotieForm(forms.ModelForm):
     categorii = forms.ModelMultipleChoiceField(
         queryset=Categorie.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         required=True,
-        label="Selectează categoriile (Doar cele cu template existent!)"
+        label="Selecteazs categoriile (Doar cele cu template existent!)"
     )
-    
     valabilitate_zile = forms.IntegerField(min_value=1, initial=7, label="Valabilitate (zile)")
-
     class Meta:
         model = Promotie
         fields = ['nume', 'subiect', 'mesaj', 'categorii']

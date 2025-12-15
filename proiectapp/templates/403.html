@@ -7,7 +7,7 @@
         {% if user.is_authenticated %}
             Salut {{ user.username }}
         {% else %}
-            Salut anonim
+            Salut preastimate anonim
         {% endif %}
     </p>
 
@@ -24,11 +24,11 @@
 
         {% if count > n_max %}
             <p style="color: red; font-weight: bold; font-size: 1.2em;">
-                ATENȚIE: Ai incercat de prea multe ori sa accesezi resurse interzise!
+                ATENTIE: Ai incercat de prea multe ori sa accesezi resurse interzise!
             </p>
         {% endif %}
     </div>
 
-    <a href="{% url 'index' %}" class="btn btn-primary mt-3">Înapoi la prima pagină</a>
+    <a href="{% url 'index' %}" class="btn btn-primary mt-3">Inapoi la prima pagina</a>
 </div>
 {% endblock %}

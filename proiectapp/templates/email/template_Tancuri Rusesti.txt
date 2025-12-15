@@ -1,0 +1,12 @@
+Privet {nume_client},
+
+Pentru colectionarul pasionat de forta bruta a blindatelor din Est!
+Avem noutati importante in categoria Tancuri Rusesti:
+{subiect}
+
+Aceasta oferta speciala este valabila până la data de: {data_expirare}.
+
+Mesaj din partea comandamentului:
+{mesaj}
+
+{alte_date}

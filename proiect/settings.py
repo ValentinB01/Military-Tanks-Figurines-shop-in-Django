@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+    'django_crontab',
     'proiectapp',
 ]
 
@@ -153,9 +155,10 @@ DEFAULT_FORM_EMAIL = 'Da-Boss <test.tweb.node@gmail.com>'
 
 
 ADMINS = [
-    ('Admin Nume', 'admin@example.com'),
+    ('Admin Unu', 'admin1@example.com'),
+    ('Admin Doi', 'admin2@example.com'),
 ]
-SERVER_EMAIL = 'server@tweb-node.com'
+SERVER_EMAIL = 'server@tweb-proiect.com'
 
 
 LOGGING = {
@@ -218,3 +221,27 @@ LOGGING = {
 }
 
 N_MAX_403 = 5
+MESSAGE_LEVEL = 10
+
+
+
+K_MINUTE_STERGERE = 2
+
+Z_ZI_NEWSLETTER = 1   
+O_ORA_NEWSLETTER = 10
+X_VECHIME_MINUTE = 60
+
+M_MINUTE_LOGS = 30 
+
+Z2_ZI_RAPORT = 4      
+O2_ORA_RAPORT = 18   
+
+CRONJOBS = [
+    (f'*/{K_MINUTE_STERGERE} * * * *', 'proiectapp.cron.sterge_utilizatori_neconfirmati'),
+
+    (f'0 {O_ORA_NEWSLETTER} * * {Z_ZI_NEWSLETTER}', 'proiectapp.cron.trimite_newsletter'),
+
+    (f'*/{M_MINUTE_LOGS} * * * *', 'proiectapp.cron.curata_loguri_vechi'),
+
+    (f'0 {O2_ORA_RAPORT} * * {Z2_ZI_RAPORT}', 'proiectapp.cron.raport_stoc_critic'),
+]

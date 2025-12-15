@@ -1,0 +1,13 @@
+Guten Tag {nume_client},
+
+Deoarece esti un colecționar pasionat de inginerie germana, avem o veste buna pentru tine!
+Avem o noua oferta la categoria Tancuri Germane:
+{subiect}
+
+Aceasta promotie exclusiva este valabila pana la data de: {data_expirare}.
+
+Mesaj special din partea echipei Military Tanks: 
+{mesaj}
+
+Detalii suplimentare:
+{alte_date}

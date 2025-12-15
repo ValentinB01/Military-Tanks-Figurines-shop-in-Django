@@ -10,6 +10,8 @@ import datetime
 from django.core.paginator import Paginator
 import re
 import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 import os
 import time
 from django.conf import settings
@@ -29,7 +31,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-
+from django.db.models import Case, When, IntegerField, F
 
 from .forms import (
     FigurinaFiltruForm, 
@@ -213,13 +215,12 @@ def in_lucru(request):
     return render(request, 'in_lucru.html', context)
 
 def cos_virtual(request):
-    context = {'ip_address': get_ip_address(request)}
-    return render(request, 'in_lucru.html', context)
+    return render(request, 'cos.html')
 
 def produse(request):
     if request.GET:
         logger.debug(f"DEBUG: Filtrare produse cu parametrii: {request.GET.dict()}")
-    
+    messages.debug(request, "S-au aplicat filtre de cautare pe lista de produse.")
     figurine_list = Figurina.objects.select_related(
         'id_categorie', 'id_producator', 'id_serie'
     ).prefetch_related('materiale', 'seturi_accesorii').all()
@@ -227,12 +228,12 @@ def produse(request):
     params_get = request.GET.copy()
     form = FigurinaFiltruForm(request.GET)
 
-    elemente_pe_pagina = 5
+    elemente_pe_pagina = 6
     repaginare_warning = False
     page_number_str = request.GET.get('page')
     if page_number_str and not page_number_str.isdigit():
         logger.warning(f"WARNING: Parametru de paginare invalid primit: {page_number_str}")
-
+        messages.warning(request, f"Numarul paginii '{page_number_str}' este invalid. S-au afisat rezultatele de pe prima pagina.")
     if request.GET:
         if form.is_valid():
             nume_query = request.GET.get('nume_figurina')
@@ -295,7 +296,7 @@ def produse(request):
                     if page_number_str and int(page_number_str) > 1:
                         repaginare_warning = True
                 except (ValueError, TypeError):
-                    elemente_pe_pagina = 5 
+                    elemente_pe_pagina = 6 
                     
             sort_by = request.GET.get('ordonare')
             
@@ -347,6 +348,8 @@ def produse(request):
 
 def produs_detaliu(request, id_figurina):
     figurina = get_object_or_404(Figurina, id_figurina=id_figurina)
+    
+    messages.debug(request, f"Se afiseaza detaliile pentru produsul cu ID: {id_figurina}")
     
     if figurina.stoc_disponibil < 3:
         logger.warning(f"WARNING: Stoc critic pentru produsul {figurina.nume_figurina} (ID: {id_figurina})")
@@ -512,7 +515,7 @@ def adauga_produs(request):
             figurina.pret = pret_ach * (1 + (adaos / 100))
             figurina.save()
             form.save_m2m()
-            messages.success(request, f"Produsul '{figurina.nume_figurina}' a fost adăugat cu succes!")
+            messages.success(request, f"Produsul '{figurina.nume_figurina}' a fost adaugat cu succes!")
             return redirect('produse') 
     else:
         form = FigurinaModelForm()
@@ -627,7 +630,7 @@ def contact(request):
                 
                 mesaj_html = f"""
                     <h1 style="color: red;">{subiect}</h1>
-                    <p>A apărut o excepție la salvarea fișierului JSON:</p>
+                    <p>A aparut o exceptie la salvarea fisierului JSON:</p>
                     <div style="background-color: red; color: white; padding: 10px;">
                         {str(e)}
                     </div>
@@ -640,8 +643,8 @@ def contact(request):
                     fail_silently=True
                 )
                 
-                print(f"!!! EROARE CRITICĂ: {e}")
-                form.add_error(None, "Eroare internă. Administratorii au fost notificați.")
+                print(f"!!! EROARE CRITICA: {e}")
+                form.add_error(None, "Eroare interna. Administratorii au fost notificati.")
 
 
 
@@ -682,8 +685,7 @@ def register_view(request):
                 html_message=html_message,
                 fail_silently=False
             )
-
-            messages.success(request, 'Cont creat! Te rugăm să verifici email-ul pentru confirmare.')
+            messages.success(request, 'Cont creat! Te rugam sa verifici email-ul pentru confirmare.')
             return redirect('login') 
     else:
         form = CustomUserCreationForm()
@@ -697,11 +699,11 @@ def confirma_mail(request, cod):
         user = CustomUser.objects.get(cod=cod)
         
         if user.email_confirmat:
-            messages.info(request, "Adresa de email este deja confirmată.")
+            messages.info(request, "Adresa de email este deja confirmata.")
         else:
             user.email_confirmat = True
             user.save()
-            messages.success(request, "Email confirmat cu succes! Acum te poți loga.")
+            messages.success(request, "Email confirmat cu succes! Acum te poti loga.")
             
     except CustomUser.DoesNotExist:
         messages.error(request, "Cod de confirmare invalid sau expirat.")
@@ -729,9 +731,8 @@ def login_view(request):
             
             if user is not None:
                 if not user.email_confirmat:
-                    if user.blocat:
-                        messages.error(request, 'Contul tău a fost blocat de un moderator. Nu te poți loga.')
-                        return redirect('login')
+                    messages.error(request, 'Trebuie sa confirmi adresa de email inainte de a te loga!')
+                    return redirect('login')
                 
                 cache.delete(cache_key)
                 logger.info(f"INFO: Utilizatorul {user.username} s-a logat cu succes.")
@@ -774,7 +775,7 @@ def login_view(request):
                     mesaj_html = f"""
                         <h1 style="color: red;">{subiect}</h1>
                         <p><strong>Username incercat:</strong> {username_incercat}</p>
-                        <p><strong>IP Sursă:</strong> {ip}</p>
+                        <p><strong>IP Sursa:</strong> {ip}</p>
                         <p>Sistemul a detectat incercari repetate de autentificare esuata.</p>
                     """
                     
@@ -785,10 +786,10 @@ def login_view(request):
                         fail_silently=True
                     )
                     
-                messages.error(request, 'Nume de utilizator sau parolă incorectă.')
+                messages.error(request, 'Nume de utilizator sau parola incorecta.')
                 
         else:
-            messages.error(request, 'Formular invalid. Verifică datele introduse.')
+            messages.error(request, 'Formular invalid. Verifica datele introduse.')
 
     else:
         form = CustomLoginForm()
@@ -841,7 +842,6 @@ def change_password_view(request):
 def promotii_view(request):
     if not request.user.is_superuser:
         return redirect('index')
-
     if request.method == 'POST':
         form = PromotieForm(request.POST)
         if form.is_valid():
@@ -873,7 +873,7 @@ def promotii_view(request):
                     with open(cale_template, 'r') as f:
                         continut_template = f.read()
                 except FileNotFoundError:
-                    continut_template = "Salut! Avem o promoție specială: {subiect}. Expiră la {data_expirare}. Detalii: {mesaj}"
+                    continut_template = "Salut! Avem o promotie speciala: {subiect}. Expira la {data_expirare}. Detalii: {mesaj}"
 
                 for user in users_target:
                     mesaj_final = continut_template.format(
@@ -893,9 +893,9 @@ def promotii_view(request):
             
             if mesaje_de_trimis:
                 send_mass_mail(tuple(mesaje_de_trimis), fail_silently=False)
-                messages.success(request, f"Promoția a fost trimisă la {len(mesaje_de_trimis)} utilizatori!")
+                messages.success(request, f"Promotia a fost trimisa la {len(mesaje_de_trimis)} utilizatori!")
             else:
-                messages.warning(request, "Nu au fost găsiți utilizatori eligibili (care au vizualizat produse).")
+                messages.warning(request, "Nu au fost gasiti utilizatori eligibili (care au vizualizat produse).")
                 
             return redirect('promotii')
             
@@ -912,7 +912,7 @@ def view_403(request, exception=None):
     
     context = {
         'titlu': '',
-        'mesaj_personalizat': 'Nu aveți permisiunea de a accesa această resursă.',
+        'mesaj_personalizat': 'Nu aveti permisiunea de a accesa aceasta resursa.',
         'count': cnt,
         'n_max': settings.N_MAX_403
     }
@@ -953,10 +953,40 @@ def oferta_view(request):
         
         context = {
             'titlu': 'Eroare afisare oferta',
-            'mesaj_personalizat': 'Nu ai voie să vizualizezi oferta',
+            'mesaj_personalizat': 'Nu ai voie sa vizualizezi oferta',
             'count': cnt,
             'n_max': getattr(settings, 'N_MAX_403', 5)
         }
         return render(request, '403.html', context, status=403)
 
     return render(request, 'oferta.html')
+
+
+@require_POST
+def finalizeaza_comanda(request):
+    try:
+        data = json.loads(request.body)
+        cos_client = data.get('cos', {})
+        
+        if not cos_client:
+            return JsonResponse({'success': False, 'message': 'Coș gol'})
+
+        for id_produs, item in cos_client.items():
+            produs = Figurina.objects.get(id_figurina=id_produs)
+            cantitate_ceruta = int(item['cantitate'])
+            
+            if produs.stoc_disponibil < cantitate_ceruta:
+                return JsonResponse({
+                    'success': False, 
+                    'message': f'Stoc insuficient pentru {produs.nume_figurina}.'
+                })
+
+        for id_produs, item in cos_client.items():
+            produs = Figurina.objects.get(id_figurina=id_produs)
+            produs.stoc_disponibil -= int(item['cantitate'])
+            produs.save()
+            
+        return JsonResponse({'success': True})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})

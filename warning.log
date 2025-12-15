@@ -1,0 +1,10 @@
+CRITICAL 2025-11-27 13:09:34,267 forms CRITICAL: Tentativa de inregistrare cu username interzis 'ADMIN'!
+CRITICAL 2025-11-27 13:10:31,621 forms CRITICAL: Tentativa de inregistrare cu username interzis 'ADMIN'!
+WARNING 2025-12-03 00:30:01,984 cron WARNING: Task de mentenanta. S-au sters 301 intrari vechi din AccessLog.
+WARNING 2025-12-03 20:30:01,845 cron WARNING: Task de mentenanta. S-au sters 13 intrari vechi din AccessLog.
+WARNING 2025-12-03 23:30:02,263 cron WARNING: Task de mentenanta. S-au sters 6 intrari vechi din AccessLog.
+WARNING 2025-12-04 00:00:01,865 cron WARNING: Task de mentenanta. S-au sters 29 intrari vechi din AccessLog.
+WARNING 2025-12-04 13:00:01,962 cron WARNING: Task de mentenanta. S-au sters 8 intrari vechi din AccessLog.
+WARNING 2025-12-04 13:30:01,626 cron WARNING: Task de mentenanta. S-au sters 18 intrari vechi din AccessLog.
+WARNING 2025-12-05 00:29:08,933 views WARNING: Stoc critic pentru produsul M4A3E8 Shermann (ID: 15)
+WARNING 2025-12-16 00:00:02,747 cron WARNING: Task de mentenanta. S-au sters 122 intrari vechi din AccessLog.

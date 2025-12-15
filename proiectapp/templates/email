@@ -1,9 +1,0 @@
-Salut {nume_client},
-
-Deoarece esti fan Tancuri Grele, avem o veste buna!
-{subiect}
-
-Promotia este valabila pana la: {data_expirare}.
-Mesaj din partea echipei: {mesaj}
-
-{alte_date}

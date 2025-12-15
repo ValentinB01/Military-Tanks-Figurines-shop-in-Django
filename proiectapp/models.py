@@ -4,6 +4,7 @@ from datetime import date
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
+from django.urls import reverse
 
 
 class CustomUser(AbstractUser):
@@ -120,6 +121,9 @@ class Categorie(models.Model):
         verbose_name_plural = "Categorii"
     def __str__(self):
         return self.nume_categorie
+    
+    def get_absolute_url(self):
+        return reverse('categorie_detaliu', args=[self.nume_categorie])
 
 class Producator(models.Model):
     id_producator = models.AutoField(primary_key=True)
@@ -166,6 +170,9 @@ class Seria(models.Model):
         verbose_name_plural = "Serii"
     def __str__(self):
         return f"{self.nume_serie} ({self.scala})"
+    
+    def get_absolute_url(self):
+        return reverse('serie_detaliu', args=[str(self.id_serie)])
 
 class SetAccessorii(models.Model):
     TIP_ACCESORII_CHOICES = [
@@ -265,6 +272,9 @@ class Figurina(models.Model):
         verbose_name_plural = "Figurine"
     def __str__(self):
         return self.nume_figurina
+    
+    def get_absolute_url(self):
+        return reverse('produs_detaliu', args=[str(self.id_figurina)])
 
 class FigurinaMaterial(models.Model):
     figurina = models.ForeignKey(Figurina, on_delete=models.CASCADE)
@@ -309,3 +319,5 @@ class Promotie(models.Model):
 
     def __str__(self):
         return self.nume
+    
+    
