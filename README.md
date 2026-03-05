@@ -37,18 +37,6 @@ Tech Stack
 | **Tools** | Git, Docker, Linux, CMAKE |
 
 
-Project Structure
-
-├── proiect/                # Core settings and configuration
-├── proiectapp/             # Main application logic
-│   ├── static/             # CSS, JS, and UI Images
-│   ├── templates/          # HTML Templates (MVT - View layer)
-│   ├── migrations/         # Database schema history
-│   ├── forms.py            # User & Product input validation
-│   └── models.py           # Database architecture
-├── media/                  # Uploaded product figurines images
-├── manage.py               # Django CLI tool
-└── backup_sql_auto.sh      # Maintenance scripts
 
 
 
@@ -78,6 +66,7 @@ venv\Scripts\activate
 
 # Activate on Linux/macOS:
 source venv/bin/activate
+
 4. Install Dependencies
 If you haven't created a requirements.txt yet, you should do so. To install them, run:
 
