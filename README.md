@@ -42,59 +42,62 @@ Tech Stack
 
 
 
-Installation & Setup
+# Installation & Setup
 Follow these steps to get the project running locally on your machine.
 
-1. Prerequisites
+# Prerequisites
 Python 3.12 or higher installed.
 
 Git installed.
 
-2. Clone the Repository
+# Clone the Repository
 Bash
 git clone https://github.com/ValentinB01/Military-Tanks-Figurines-shop-in-Django.git
 cd Military-Tanks-Figurines-shop-in-Django
-3. Create and Activate a Virtual Environment
+
+# Create and Activate a Virtual Environment
 It is highly recommended to use a virtual environment to keep dependencies isolated.
 
 Bash
-# Create venv
+Create venv
 python -m venv venv
 
-# Activate on Windows:
+Activate on Windows:
 venv\Scripts\activate
 
-# Activate on Linux/macOS:
+Activate on Linux/macOS:
 source venv/bin/activate
 
-4. Install Dependencies
+# Install Dependencies
 If you haven't created a requirements.txt yet, you should do so. To install them, run:
 
 Bash
 pip install django
-# Add any other libraries you used, like:
-# pip install pillow (for images)
+Add any other libraries you used, like:
+pip install pillow (for images)
 (Note: If you already have a requirements.txt, just run pip install -r requirements.txt).
 
-5. Database Setup & Migrations
+# Database Setup & Migrations
 Initialize the SQLite database and create the necessary tables:
 
 Bash
 python manage.py makemigrations
 python manage.py migrate
-6. Populate Initial Data (Optional)
+
+# Populate Initial Data (Optional)
 To quickly see the shop with products (Tanks), run the population script:
 
 Bash
 python manage.py shell < proiectapp/populate_tancuri.py
-7. Create an Admin Account
+
+# Create an Admin Account
 To access the /admin dashboard and manage figurines or users:
 
 Bash
 python manage.py createsuperuser
 Follow the prompts to set your username, email, and password.
 
-8. Run the Development Server
+# Run the Development Server
 Bash
 python manage.py runserver
 Once started, open your browser and navigate to: http://127.0.0.1:8000/
