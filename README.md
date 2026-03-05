@@ -42,7 +42,7 @@ Tech Stack
 
 <img width="1889" height="886" alt="image" src="https://github.com/user-attachments/assets/91770c73-1c7a-48d6-8838-85316764901f" />
 
-<img width="1889" height="886" alt="image" src="https://github.com/user-attachments/assets/b8f80308-30e7-4d6b-aa85-7b18b167a020" />
+<img width="1889" height="940" alt="image" src="https://github.com/user-attachments/assets/9f693703-da84-433c-89d2-196fbec0a3a3" />
 
 
 
